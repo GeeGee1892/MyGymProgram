@@ -243,8 +243,8 @@ export const WelcomeScreen = ({ navigation }) => (
   <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
     <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 60 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 48 }}>
-        <View style={{ width: 48, height: 48, backgroundColor: '#fff', borderRadius: 12, alignItems: 'center', justifyContent: 'center' }}><Text style={{ color: '#000', fontSize: 20, fontWeight: '900' }}>K</Text></View>
-        <View><Text style={{ color: '#fff', fontSize: 20, fontWeight: '700' }}>KEYSTONE</Text><Text style={{ color: '#71717a', fontSize: 10, letterSpacing: 4 }}>FITNESS</Text></View>
+        <View style={{ width: 48, height: 48, backgroundColor: '#0d1117', borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#27272a' }}><Text style={{ color: '#10b981', fontSize: 18 }}>📈</Text></View>
+        <View><Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>MyGymProgram</Text><Text style={{ color: '#71717a', fontSize: 10, letterSpacing: 2 }}>Plans • Log • Analytics</Text></View>
       </View>
       <Text style={{ fontSize: 36, fontWeight: '700', color: '#fff', lineHeight: 44, marginBottom: 16 }}>Track your lifts.{'\n'}<Text style={{ color: '#71717a' }}>See your progress.</Text></Text>
       <Text style={{ fontSize: 18, color: '#71717a', marginBottom: 48 }}>Simple workout tracking with smart suggestions.</Text>

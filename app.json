@@ -1,11 +1,37 @@
 {
   "expo": {
-    "name": "Keystone Fitness",
-    "slug": "keystone-fitness",
+    "name": "MyGymProgram",
+    "slug": "mygymprogram",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "ios": { "bundleIdentifier": "com.keystone.fitness" },
-    "android": { "package": "com.keystone.fitness" }
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0d1117"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.mygymprogram.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0d1117"
+      },
+      "package": "com.mygymprogram.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "188d411d-dffc-4fcf-9624-10815da54e8c"
+      }
+    }
   }
 }
