@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "Keystone Fitness",
+    "slug": "keystone-fitness",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "ios": { "bundleIdentifier": "com.keystone.fitness" },
+    "android": { "package": "com.keystone.fitness" }
+  }
+}
