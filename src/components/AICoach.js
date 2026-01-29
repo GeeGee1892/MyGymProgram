@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform
+} from 'react-native';
 import { useStore } from '../store';
 import { spacing, colors, radius, fontSize, fontWeight } from '../utils/theme';
 import { calcVolume, fmtDate } from '../utils';
@@ -10,7 +19,7 @@ export const AICoach = () => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef(null);
-  
+
   // Initial greeting
   useEffect(() => {
     const greeting = {
@@ -27,12 +36,12 @@ What would you like to know?`,
     };
     setMessages([greeting]);
   }, []);
-  
+
   // Scroll to bottom when new messages arrive
   useEffect(() => {
     scrollRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
-  
+
   // Build context about user for AI
   const buildUserContext = () => {
     // Recent workouts
@@ -43,15 +52,15 @@ What would you like to know?`,
       volume: w.volume,
       sets: w.sets.length,
     }));
-    
+
     // Weight trend (last 7 days)
     const recentWeight = dailyCheckIns
       .slice(-7)
       .map(c => ({ date: fmtDate(c.date), weight: c.weight }));
-    
+
     // Weekly review
     const lastReview = weeklyReviews[weeklyReviews.length - 1];
-    
+
     return {
       profile: {
         name: userData.name,
@@ -67,18 +76,18 @@ What would you like to know?`,
       last_weekly_review: lastReview,
     };
   };
-  
+
   const sendMessage = async () => {
     if (!input.trim()) return;
-    
+
     const userMessage = { role: 'user', content: input };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setLoading(true);
-    
+
     try {
       const context = buildUserContext();
-      
+
       // Call Claude API
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -91,8 +100,9 @@ What would you like to know?`,
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1000,
-          system: `You are a professional fitness coach helping a user with their workout tracking app. Here is the user's current data:
+          system: `You are a professional fitness coach helping a user with their workout tracking app.
 
+Here is the user's current data:
 ${JSON.stringify(context, null, 2)}
 
 Provide personalized, actionable advice based on their data. Be encouraging but honest. Focus on:
@@ -109,23 +119,25 @@ Keep responses concise (2-3 paragraphs max). Use emojis sparingly.`,
           ],
         }),
       });
-      
+
       if (!response.ok) {
         throw new Error('API request failed');
       }
-      
+
       const data = await response.json();
       const assistantMessage = {
         role: 'assistant',
         content: data.content[0].text,
       };
-      
+
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('AI Coach error:', error);
       const errorMessage = {
         role: 'assistant',
-        content: `Sorry, I encountered an error. This feature requires an API key to be configured. In production, this would be handled securely on a backend server.
+        content: `Sorry, I encountered an error. This feature requires an API key to be configured.
+
+In production, this would be handled securely on a backend server.
 
 For now, I can help you with general fitness advice without the AI analysis. What would you like to know?`,
       };
@@ -134,7 +146,7 @@ For now, I can help you with general fitness advice without the AI analysis. Wha
       setLoading(false);
     }
   };
-  
+
   // Quick suggestion buttons
   const quickQuestions = [
     "Should I deload soon?",
@@ -142,7 +154,7 @@ For now, I can help you with general fitness advice without the AI analysis. Wha
     "Am I eating enough protein?",
     "How's my progress?",
   ];
-  
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -166,14 +178,14 @@ For now, I can help you with general fitness advice without the AI analysis. Wha
             <Text style={styles.messageText}>{msg.content}</Text>
           </View>
         ))}
-        
+
         {loading && (
           <View style={styles.loadingMessage}>
             <Text style={styles.loadingText}>Thinking...</Text>
           </View>
         )}
       </ScrollView>
-      
+
       {/* Quick Questions */}
       {messages.length <= 1 && (
         <View style={styles.quickQuestions}>
@@ -197,7 +209,7 @@ For now, I can help you with general fitness advice without the AI analysis. Wha
           </View>
         </View>
       )}
-      
+
       {/* Input */}
       <View style={styles.inputContainer}>
         <TextInput
@@ -205,7 +217,7 @@ For now, I can help you with general fitness advice without the AI analysis. Wha
           value={input}
           onChangeText={setInput}
           placeholder="Ask your coach anything..."
-          placeholderTextColor={colors.textDisabled}
+          placeholderTextColor="#52525b"
           multiline
           maxLength={500}
         />
@@ -224,108 +236,108 @@ For now, I can help you with general fitness advice without the AI analysis. Wha
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#000',
   },
   messages: {
     flex: 1,
   },
   messagesContent: {
-    padding: spacing.lg,
+    padding: 16,
   },
   message: {
     maxWidth: '80%',
-    marginBottom: spacing.lg,
-    padding: spacing.lg,
-    borderRadius: radius.md,
+    marginBottom: 16,
+    padding: 16,
+    borderRadius: 12,
   },
   messageUser: {
     alignSelf: 'flex-end',
-    backgroundColor: colors.primary,
+    backgroundColor: '#10b981',
   },
   messageAssistant: {
     alignSelf: 'flex-start',
-    backgroundColor: colors.card,
+    backgroundColor: '#18181b',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: '#27272a',
   },
   messageText: {
-    fontSize: fontSize.md,
-    color: colors.textPrimary,
+    fontSize: 16,
+    color: '#fff',
     lineHeight: 22,
   },
   loadingMessage: {
     alignSelf: 'flex-start',
-    backgroundColor: colors.card,
-    padding: spacing.lg,
-    borderRadius: radius.md,
+    backgroundColor: '#18181b',
+    padding: 16,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: '#27272a',
   },
   loadingText: {
-    fontSize: fontSize.md,
-    color: colors.textTertiary,
+    fontSize: 16,
+    color: '#a1a1aa',
     fontStyle: 'italic',
   },
   quickQuestions: {
-    padding: spacing.lg,
+    padding: 16,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: '#27272a',
   },
   quickQuestionsLabel: {
-    fontSize: fontSize.sm,
-    color: colors.textTertiary,
-    marginBottom: spacing.sm,
-    fontWeight: fontWeight.medium,
+    fontSize: 12,
+    color: '#a1a1aa',
+    marginBottom: 8,
+    fontWeight: '500',
   },
   quickQuestionsButtons: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.sm,
+    gap: 8,
   },
   quickButton: {
-    backgroundColor: colors.card,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.md,
+    backgroundColor: '#18181b',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: '#27272a',
   },
   quickButtonText: {
-    fontSize: fontSize.sm,
-    color: colors.textSecondary,
+    fontSize: 12,
+    color: '#d4d4d8',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    padding: spacing.lg,
+    padding: 16,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
-    backgroundColor: colors.background,
-    gap: spacing.md,
+    borderTopColor: '#27272a',
+    backgroundColor: '#000',
+    gap: 12,
   },
   input: {
     flex: 1,
-    backgroundColor: colors.card,
+    backgroundColor: '#18181b',
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    padding: spacing.lg,
-    fontSize: fontSize.md,
-    color: colors.textPrimary,
+    borderColor: '#27272a',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    color: '#fff',
     maxHeight: 100,
   },
   sendButton: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.lg,
-    borderRadius: radius.md,
+    backgroundColor: '#10b981',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderRadius: 12,
   },
   sendButtonDisabled: {
     opacity: 0.5,
   },
   sendButtonText: {
-    fontSize: fontSize.md,
-    fontWeight: fontWeight.semibold,
-    color: colors.background,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
   },
 });
