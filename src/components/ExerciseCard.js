@@ -1,157 +1,161 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { exerciseDB } from '../data/exercises';
+import React, { useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { spacing, colors, radius, fontSize, fontWeight } from '../utils/theme';
+
+// Default placeholder for missing images
+const PLACEHOLDER_COLOR = '#2a2a2a';
 
 export const ExerciseCard = ({ 
   exercise, 
-  index, 
   onPress, 
-  onSwap, 
-  showSwap = true,
-  completed = false,
-  suggestion = null, 
+  selected = false,
+  showImage = true,
+  compact = false 
 }) => {
-  const data = exerciseDB[exercise.id] || { name: exercise.id, muscles: 'Unknown' };
-  
-  return (
-    <TouchableOpacity 
-      style={[styles.card, completed && styles.cardCompleted]} 
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
+  const [imageError, setImageError] = useState(false);
+  const { name, muscles, cues, media } = exercise;
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  const renderImage = () => {
+    if (!showImage) return null;
+    
+    const imageSize = compact ? styles.imageCompact : styles.image;
+    
+    // If no media or image failed to load, show placeholder
+    if (!media || imageError) {
+      return (
+        <View style={[imageSize, styles.placeholder]}>
+          <Text style={styles.placeholderIcon}>🏋️</Text>
+        </View>
+      );
+    }
+
+    return (
+      <Image
+        source={media}
+        style={imageSize}
+        resizeMode="cover"
+        onError={handleImageError}
+      />
+    );
+  };
+
+  const content = (
+    <View style={[
+      styles.container, 
+      selected && styles.containerSelected,
+      compact && styles.containerCompact
+    ]}>
+      {renderImage()}
       <View style={styles.content}>
-        {/* Exercise number/checkmark */}
-        <View style={[styles.badge, completed && styles.badgeCompleted]}>
-          <Text style={[styles.badgeText, completed && styles.badgeTextCompleted]}>
-            {completed ? '✓' : index + 1}
-          </Text>
-        </View>
-        
-        {/* Exercise info */}
-        <View style={styles.info}>
-          <Text style={[styles.name, completed && styles.nameCompleted]}>
-            {data.name}
-          </Text>
-          <Text style={styles.meta}>
-            {exercise.sets} × {exercise.reps} • {data.muscles}
-          </Text>
-          
-          {/* Progressive suggestion */}
-          {suggestion && !completed && (
-            <View style={styles.suggestionBadge}>
-              <Text style={styles.suggestionText}>
-                💪 {suggestion.suggestion}
+        <Text style={styles.name} numberOfLines={compact ? 1 : 2}>
+          {name}
+        </Text>
+        {!compact && (
+          <>
+            <Text style={styles.muscles} numberOfLines={1}>
+              {muscles}
+            </Text>
+            {cues && cues.length > 0 && (
+              <Text style={styles.cue} numberOfLines={1}>
+                💡 {cues[0]}
               </Text>
-            </View>
-          )}
-        </View>
-        
-        {/* Swap button */}
-        {showSwap && !completed && (
-          <TouchableOpacity 
-            style={styles.swapButton} 
-            onPress={(e) => {
-              e.stopPropagation();
-              onSwap && onSwap(index);
-            }}
-          >
-            <Text style={styles.swapIcon}>↻</Text>
-            <Text style={styles.swapText}>Swap</Text>
-          </TouchableOpacity>
+            )}
+          </>
         )}
       </View>
-    </TouchableOpacity>
+      {selected && (
+        <View style={styles.checkmark}>
+          <Text style={styles.checkmarkText}>✓</Text>
+        </View>
+      )}
+    </View>
   );
+
+  if (onPress) {
+    return (
+      <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+        {content}
+      </TouchableOpacity>
+    );
+  }
+
+  return content;
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#18181b',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#27272a',
-    // Subtle shadow for depth
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+  container: {
+    flexDirection: 'row',
+    backgroundColor: colors.card || '#1a1a1a',
+    borderRadius: radius.md || 12,
+    padding: spacing.sm || 12,
+    marginBottom: spacing.sm || 12,
+    alignItems: 'center',
   },
-  cardCompleted: {
-    opacity: 0.5,
-    backgroundColor: '#09090b',
+  containerSelected: {
+    borderWidth: 2,
+    borderColor: colors.primary || '#FF6B35',
+  },
+  containerCompact: {
+    padding: spacing.xs || 8,
+    marginBottom: spacing.xs || 8,
+  },
+  image: {
+    width: 80,
+    height: 80,
+    borderRadius: radius.sm || 8,
+    marginRight: spacing.sm || 12,
+  },
+  imageCompact: {
+    width: 50,
+    height: 50,
+    borderRadius: radius.xs || 6,
+    marginRight: spacing.xs || 8,
+  },
+  placeholder: {
+    backgroundColor: PLACEHOLDER_COLOR,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  placeholderIcon: {
+    fontSize: 24,
   },
   content: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  badge: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: '#27272a',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  badgeCompleted: {
-    backgroundColor: '#10b981',
-  },
-  badgeText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#a1a1aa',
-  },
-  badgeTextCompleted: {
-    color: '#000',
-  },
-  info: {
     flex: 1,
+    justifyContent: 'center',
   },
   name: {
-    fontSize: 16,
-    fontWeight: '600',
     color: '#fff',
+    fontSize: fontSize.md || 16,
+    fontWeight: fontWeight.semibold || '600',
     marginBottom: 4,
-    letterSpacing: 0.2,
   },
-  nameCompleted: {
-    color: '#71717a',
-    textDecorationLine: 'line-through',
+  muscles: {
+    color: colors.textSecondary || '#888',
+    fontSize: fontSize.sm || 14,
+    marginBottom: 4,
   },
-  meta: {
-    fontSize: 13,
-    color: '#71717a',
-    lineHeight: 18,
+  cue: {
+    color: colors.primary || '#FF6B35',
+    fontSize: fontSize.xs || 12,
   },
-  suggestionBadge: {
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-    borderRadius: 6,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    marginTop: 8,
-    alignSelf: 'flex-start',
-  },
-  suggestionText: {
-    fontSize: 12,
-    color: '#10b981',
-    fontWeight: '500',
-  },
-  swapButton: {
-    flexDirection: 'column',
+  checkmark: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: colors.primary || '#FF6B35',
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingLeft: 12,
-    gap: 4,
+    marginLeft: spacing.sm || 12,
   },
-  swapIcon: {
-    fontSize: 20,
-    color: '#a1a1aa',
-  },
-  swapText: {
-    fontSize: 11,
-    color: '#71717a',
-    fontWeight: '500',
+  checkmarkText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 });
+
+export default ExerciseCard;

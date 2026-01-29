@@ -6,51 +6,39 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ErrorBoundary } from './src/components';
 import { useStore } from './src/store';
 
-// Import screens
-// TODO: Import all your screens here
-// For now, importing only what we've built
+// Import available screens
 import { DailyCheckInScreen } from './src/screens/Home/DailyCheckInScreen';
-
-// You'll need to migrate these from your existing index.js:
-// import { WelcomeScreen, NameScreen, StatsScreen, GoalScreen, ... } from './src/screens/Onboarding';
-// import { HomeScreen } from './src/screens/Home';
-// import { WorkoutScreen, ActiveWorkoutScreen, WorkoutCompleteScreen } from './src/screens/Workout';
-// import { ProgressScreen } from './src/screens/Progress';
+import { ActiveWorkoutScreen } from './src/screens/Workout/ActiveWorkoutScreen';
+import { CustomWorkoutBuilder } from './src/screens/Workout/CustomWorkoutBuilder';
 
 const Stack = createNativeStackNavigator();
 
 function AppContent() {
   const { loadData, isOnboarded } = useStore();
-  
-  useEffect(() => { 
-    loadData(); 
+
+  useEffect(() => {
+    loadData();
   }, []);
 
   return (
     <SafeAreaProvider>
       <NavigationContainer>
         <StatusBar style="light" />
-        <Stack.Navigator 
-          screenOptions={{ 
-            headerShown: false, 
-            contentStyle: { backgroundColor: '#000' }, 
-            animation: 'slide_from_right' 
-          }} 
-          initialRouteName={isOnboarded ? 'DailyCheckIn' : 'Welcome'}
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: '#000' },
+            animation: 'slide_from_right'
+          }}
+          initialRouteName="DailyCheckIn"
         >
-          {/* Daily Check-In - NEW! */}
+          {/* Daily Check-In - Home Screen */}
           <Stack.Screen name="DailyCheckIn" component={DailyCheckInScreen} />
           
-          {/* TODO: Add all your other screens here */}
-          {/* Onboarding flow */}
-          {/* <Stack.Screen name="Welcome" component={WelcomeScreen} /> */}
-          {/* <Stack.Screen name="Name" component={NameScreen} /> */}
-          {/* ... etc */}
+          {/* Workout Screens */}
+          <Stack.Screen name="ActiveWorkout" component={ActiveWorkoutScreen} />
+          <Stack.Screen name="CustomWorkout" component={CustomWorkoutBuilder} />
           
-          {/* Main app */}
-          {/* <Stack.Screen name="Home" component={HomeScreen} /> */}
-          {/* <Stack.Screen name="Workout" component={WorkoutScreen} /> */}
-          {/* ... etc */}
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
