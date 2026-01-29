@@ -19,7 +19,7 @@ export const exerciseDB = {
     name: 'Flat Dumbbell Press',
     muscles: 'Mid chest, triceps',
     cues: ['Full range of motion', 'Squeeze at top', 'Palms forward', 'Control descent'],
-    media: require('../../training-fit-library/chest/chest-press.png')
+    media: require('../../training-fit-library/chest/dumbbell-bench-press.png')
   },
   chest_press_machine: {
     name: 'Machine Chest Press',
@@ -37,13 +37,13 @@ export const exerciseDB = {
     name: 'Pec Deck',
     muscles: 'Chest',
     cues: ['Elbows at 90°', 'Squeeze hard at contraction', 'Pause for 1 second', 'Full stretch'],
-    media: null
+    media: require('../../training-fit-library/chest/flys.png')
   },
   chest_dip: {
     name: 'Chest Dip',
     muscles: 'Lower chest, triceps',
     cues: ['Lean forward 20-30°', 'Deep stretch', 'Full lockout', 'Elbows flared slightly'],
-    media: require('../../training-fit-library/chest/bench-dip.png')
+    media: require('../../training-fit-library/chest/dips.png')
   },
 
   // SHOULDERS
@@ -63,7 +63,7 @@ export const exerciseDB = {
     name: 'Overhead Barbell Press',
     muscles: 'Shoulders, triceps',
     cues: ['Tight core', 'Full lockout', 'Bar path straight', 'Squeeze glutes'],
-    media: require('../../training-fit-library/shoulders/dumbbell-shoulder-press.png')
+    media: require('../../training-fit-library/shoulders/behind-the-neck-overhead-press.png')
   },
   lateral_raise_db: {
     name: 'Dumbbell Lateral Raise',
@@ -113,7 +113,7 @@ export const exerciseDB = {
     name: 'Skull Crushers',
     muscles: 'Triceps',
     cues: ['Lower to forehead', 'Elbows stationary', 'Full extension', 'Control descent'],
-    media: null
+    media: require('../../training-fit-library/triceps/barbell-skull-crusher.png')
   },
   tricep_dip: {
     name: 'Tricep Dip',
@@ -125,7 +125,7 @@ export const exerciseDB = {
     name: 'Tricep Kickback',
     muscles: 'Triceps',
     cues: ['Full extension at top', 'Squeeze hard', 'Upper arm parallel', 'Control return'],
-    media: null
+    media: require('../../training-fit-library/triceps/kickbacks.png')
   },
 
   // BACK
@@ -139,7 +139,7 @@ export const exerciseDB = {
     name: 'Close Grip Pulldown',
     muscles: 'Lats, mid-back',
     cues: ['Vertical torso', 'Squeeze lats hard', 'Touch lower chest', 'Full ROM'],
-    media: require('../../training-fit-library/back/cable-lat-pulldown.png')
+    media: require('../../training-fit-library/back/cable-lat-pulldown-close-grip.png')
   },
   pullup: {
     name: 'Pull-Up',
@@ -163,7 +163,7 @@ export const exerciseDB = {
     name: 'Dumbbell Row',
     muscles: 'Lats, mid-back',
     cues: ['Pull to hip level', 'Full stretch at bottom', 'Elbow close to body', 'Squeeze at top'],
-    media: require('../../training-fit-library/back/barbell-row.png')
+    media: require('../../training-fit-library/back/incline-dumbell-row.png')
   },
   row_cable_seated: {
     name: 'Seated Cable Row',
@@ -175,7 +175,7 @@ export const exerciseDB = {
     name: 'Chest Supported Row',
     muscles: 'Mid-back, rear delts',
     cues: ['No momentum', 'Squeeze hard', 'Full ROM', 'Feel mid-back contract'],
-    media: require('../../training-fit-library/back/barbell-row.png')
+    media: require('../../training-fit-library/back/incline-dumbell-row.png')
   },
   row_machine: {
     name: 'Machine Row',
@@ -195,7 +195,7 @@ export const exerciseDB = {
     name: 'Face Pull',
     muscles: 'Rear delts, rotator cuff',
     cues: ['Pull high to face', 'External rotation', 'Squeeze rear delts', 'Elbows high'],
-    media: require('../../training-fit-library/back/assisted-pull-ups.png')
+    media: require('../../training-fit-library/back/band-reverse-fly.png')
   },
   rear_delt_fly_cable: {
     name: 'Cable Rear Delt Fly',
@@ -207,7 +207,7 @@ export const exerciseDB = {
     name: 'Reverse Pec Deck',
     muscles: 'Rear delts',
     cues: ['Chest to pad', 'Squeeze rear delts', 'Lead with elbows', 'Full ROM'],
-    media: require('../../training-fit-library/back/band-reverse-fly.png')
+    media: require('../../training-fit-library/shoulders/reverse-butterfly.png')
   },
 
   // BICEPS
@@ -215,7 +215,7 @@ export const exerciseDB = {
     name: 'Incline Dumbbell Curl',
     muscles: 'Biceps (long head)',
     cues: ['Arms hang straight back', 'No swinging', 'Full ROM', 'Squeeze at top'],
-    media: require('../../training-fit-library/biceps/incline-bench-preacher-curls.png')
+    media: require('../../training-fit-library/biceps/incline-dumbbell-biceps-curls.png')
   },
   curl_preacher: {
     name: 'Preacher Curl',
@@ -233,7 +233,7 @@ export const exerciseDB = {
     name: 'Dumbbell Curl',
     muscles: 'Biceps',
     cues: ['Supinate at top', 'No swinging', 'Control descent', 'Full extension'],
-    media: require('../../training-fit-library/biceps/barbell-curls.png')
+    media: require('../../training-fit-library/biceps/biceps-curls.png')
   },
   curl_hammer: {
     name: 'Hammer Curl',
@@ -253,7 +253,7 @@ export const exerciseDB = {
     name: 'Wrist Curl',
     muscles: 'Forearm flexors',
     cues: ['Forearms on bench', 'Full ROM', 'Squeeze at top', 'Control descent'],
-    media: require('../../training-fit-library/biceps/barbell-curls.png')
+    media: null
   },
   wrist_curl_cable: {
     name: 'Cable Wrist Curl',
@@ -285,13 +285,13 @@ export const exerciseDB = {
     name: 'Plank',
     muscles: 'Core',
     cues: ['Straight line head to heels', 'Squeeze core', "Don't sag", 'Breathe steadily'],
-    media: require('../../training-fit-library/abs/ab-wheel-rollout.png')
+    media: require('../../training-fit-library/abs/crunches.png')
   },
   ab_wheel: {
     name: 'Ab Wheel Rollout',
     muscles: 'Abs, core',
     cues: ['Control rollout', "Don't hyperextend", 'Pull back with abs', 'Tight core'],
-    media: require('../../training-fit-library/abs/ab-wheel-rollout.png')
+    media: require('../../training-fit-library/abs/abdominal-crunch.png')
   },
 
   // LEGS - QUADS
@@ -311,7 +311,7 @@ export const exerciseDB = {
     name: 'Goblet Squat',
     muscles: 'Quads, glutes',
     cues: ['DB at chest', 'Upright torso', 'Elbows inside knees', 'Full depth'],
-    media: require('../../training-fit-library/legs/barbell-squats.png')
+    media: require('../../training-fit-library/legs/dumbbell-squats.png')
   },
   leg_press: {
     name: 'Leg Press',
@@ -329,7 +329,7 @@ export const exerciseDB = {
     name: 'Bulgarian Split Squat',
     muscles: 'Quads, glutes',
     cues: ['Front shin vertical', 'Full depth', 'Balance and control', 'Drive through heel'],
-    media: require('../../training-fit-library/legs/barbell-lunges.png')
+    media: require('../../training-fit-library/legs/lunges.png')
   },
 
   // LEGS - HAMSTRINGS/GLUTES
