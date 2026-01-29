@@ -1,0 +1,416 @@
+{
+  "chest_press_incline": {
+    "source": "training-fit-library/chest/incline-chest-press.png",
+    "destination": "assets/exercises/chest/chest_press_incline.png",
+    "trainingFitName": "Incline Chest Press",
+    "confidence": 100
+  },
+  "chest_press_flat_bb": {
+    "source": "training-fit-library/chest/chest-press.png",
+    "destination": "assets/exercises/chest/chest_press_flat_bb.png",
+    "trainingFitName": "Chest Press",
+    "confidence": 50
+  },
+  "chest_press_flat_db": {
+    "source": "training-fit-library/chest/chest-press.png",
+    "destination": "assets/exercises/chest/chest_press_flat_db.png",
+    "trainingFitName": "Chest Press",
+    "confidence": 50
+  },
+  "chest_press_machine": {
+    "source": "training-fit-library/chest/chest-press.png",
+    "destination": "assets/exercises/chest/chest_press_machine.png",
+    "trainingFitName": "Chest Press",
+    "confidence": 67
+  },
+  "chest_fly_cable": {
+    "source": "training-fit-library/chest/cable-chest-fly.png",
+    "destination": "assets/exercises/chest/chest_fly_cable.png",
+    "trainingFitName": "Cable Chest Fly",
+    "confidence": 100
+  },
+  "chest_fly_db": {
+    "source": "training-fit-library/chest/cable-chest-fly.png",
+    "destination": "assets/exercises/chest/chest_fly_db.png",
+    "trainingFitName": "Cable Chest Fly",
+    "confidence": 67
+  },
+  "shoulder_press_db": {
+    "source": "training-fit-library/shoulders/dumbbell-shoulder-press.png",
+    "destination": "assets/exercises/shoulders/shoulder_press_db.png",
+    "trainingFitName": "Dumbbell Shoulder Press",
+    "confidence": 67
+  },
+  "shoulder_press_bb": {
+    "source": "training-fit-library/shoulders/dumbbell-shoulder-press.png",
+    "destination": "assets/exercises/shoulders/shoulder_press_bb.png",
+    "trainingFitName": "Dumbbell Shoulder Press",
+    "confidence": 100
+  },
+  "shoulder_press_machine": {
+    "source": "training-fit-library/shoulders/dumbbell-shoulder-press.png",
+    "destination": "assets/exercises/shoulders/shoulder_press_machine.png",
+    "trainingFitName": "Dumbbell Shoulder Press",
+    "confidence": 67
+  },
+  "shoulder_lateral_raise": {
+    "source": "training-fit-library/shoulders/lateral-raise.png",
+    "destination": "assets/exercises/shoulders/shoulder_lateral_raise.png",
+    "trainingFitName": "Lateral Raise",
+    "confidence": 67
+  },
+  "shoulder_lateral_raise_cable": {
+    "source": "training-fit-library/back/cable-lat-pulldown.png",
+    "destination": "assets/exercises/shoulders/shoulder_lateral_raise_cable.png",
+    "trainingFitName": "Cable Lat Pulldown",
+    "confidence": 50
+  },
+  "shoulder_front_raise": {
+    "source": "training-fit-library/shoulders/barbell-front-raise.png",
+    "destination": "assets/exercises/shoulders/shoulder_front_raise.png",
+    "trainingFitName": "Barbell Front Raise",
+    "confidence": 67
+  },
+  "rear_delt_fly_cable": {
+    "source": "training-fit-library/chest/cable-chest-fly.png",
+    "destination": "assets/exercises/shoulders/rear_delt_fly_cable.png",
+    "trainingFitName": "Cable Chest Fly",
+    "confidence": 50
+  },
+  "rear_delt_fly_db": {
+    "source": "training-fit-library/back/band-reverse-fly.png",
+    "destination": "assets/exercises/shoulders/rear_delt_fly_db.png",
+    "trainingFitName": "Band Reverse Fly",
+    "confidence": 25
+  },
+  "face_pull": {
+    "source": "training-fit-library/back/assisted-pull-ups.png",
+    "destination": "assets/exercises/shoulders/face_pull.png",
+    "trainingFitName": "Assisted Pull-Ups",
+    "confidence": 33
+  },
+  "tricep_pushdown_rope": {
+    "source": "training-fit-library/triceps/cable-tricep-pushdowns.png",
+    "destination": "assets/exercises/arms/tricep_pushdown_rope.png",
+    "trainingFitName": "Cable Tricep Pushdowns",
+    "confidence": 67
+  },
+  "tricep_pushdown_bar": {
+    "source": "training-fit-library/triceps/cable-tricep-pushdowns.png",
+    "destination": "assets/exercises/arms/tricep_pushdown_bar.png",
+    "trainingFitName": "Cable Tricep Pushdowns",
+    "confidence": 67
+  },
+  "tricep_extension_overhead": {
+    "source": "training-fit-library/triceps/overhead-tricep-extension.png",
+    "destination": "assets/exercises/arms/tricep_extension_overhead.png",
+    "trainingFitName": "Overhead Tricep Extension",
+    "confidence": 100
+  },
+  "tricep_extension_cable": {
+    "source": "training-fit-library/triceps/cable-tricep-pushdowns.png",
+    "destination": "assets/exercises/arms/tricep_extension_cable.png",
+    "trainingFitName": "Cable Tricep Pushdowns",
+    "confidence": 67
+  },
+  "tricep_extension_db": {
+    "source": "training-fit-library/triceps/dumbbell-tricep-extension.png",
+    "destination": "assets/exercises/arms/tricep_extension_db.png",
+    "trainingFitName": "Dumbbell Tricep Extension",
+    "confidence": 67
+  },
+  "tricep_dip": {
+    "source": "training-fit-library/chest/bench-dip.png",
+    "destination": "assets/exercises/arms/tricep_dip.png",
+    "trainingFitName": "Bench Dip",
+    "confidence": 50
+  },
+  "curl_db_incline": {
+    "source": "training-fit-library/biceps/incline-bench-preacher-curls.png",
+    "destination": "assets/exercises/arms/curl_db_incline.png",
+    "trainingFitName": "Incline Bench Preacher Curls",
+    "confidence": 50
+  },
+  "curl_db_standing": {
+    "source": "training-fit-library/abs/hanging-leg-curl.png",
+    "destination": "assets/exercises/arms/curl_db_standing.png",
+    "trainingFitName": "Hanging Leg Curl",
+    "confidence": 33
+  },
+  "curl_bb": {
+    "source": "training-fit-library/back/dumbbell-deadlift.png",
+    "destination": "assets/exercises/arms/curl_bb.png",
+    "trainingFitName": "Dumbbell Deadlift",
+    "confidence": 50
+  },
+  "curl_barbell": {
+    "source": "training-fit-library/biceps/barbell-curls.png",
+    "destination": "assets/exercises/arms/curl_barbell.png",
+    "trainingFitName": "Barbell Curls",
+    "confidence": 100
+  },
+  "curl_cable": {
+    "source": "training-fit-library/biceps/cable-curls.png",
+    "destination": "assets/exercises/arms/curl_cable.png",
+    "trainingFitName": "Cable Curls",
+    "confidence": 100
+  },
+  "curl_hammer": {
+    "source": "training-fit-library/biceps/hammer-curls.png",
+    "destination": "assets/exercises/arms/curl_hammer.png",
+    "trainingFitName": "Hammer Curls",
+    "confidence": 100
+  },
+  "curl_preacher": {
+    "source": "training-fit-library/biceps/preacher-curls.png",
+    "destination": "assets/exercises/arms/curl_preacher.png",
+    "trainingFitName": "Preacher Curls",
+    "confidence": 100
+  },
+  "curl_reverse": {
+    "source": "training-fit-library/abs/reverse-crunches.png",
+    "destination": "assets/exercises/arms/curl_reverse.png",
+    "trainingFitName": "Reverse Crunches",
+    "confidence": 50
+  },
+  "curl_wrist": {
+    "source": "training-fit-library/biceps/barbell-curls.png",
+    "destination": "assets/exercises/arms/curl_wrist.png",
+    "trainingFitName": "Barbell Curls",
+    "confidence": 50
+  },
+  "wrist_curl": {
+    "source": "training-fit-library/biceps/barbell-curls.png",
+    "destination": "assets/exercises/arms/wrist_curl.png",
+    "trainingFitName": "Barbell Curls",
+    "confidence": 50
+  },
+  "pullup_assisted": {
+    "source": "training-fit-library/back/assisted-pull-ups.png",
+    "destination": "assets/exercises/back/pullup_assisted.png",
+    "trainingFitName": "Assisted Pull-Ups",
+    "confidence": 67
+  },
+  "pullup_weighted": {
+    "source": "training-fit-library/back/assisted-pull-ups.png",
+    "destination": "assets/exercises/back/pullup_weighted.png",
+    "trainingFitName": "Assisted Pull-Ups",
+    "confidence": 33
+  },
+  "lat_pulldown": {
+    "source": "training-fit-library/back/cable-lat-pulldown.png",
+    "destination": "assets/exercises/back/lat_pulldown.png",
+    "trainingFitName": "Cable Lat Pulldown",
+    "confidence": 67
+  },
+  "lat_pulldown_close": {
+    "source": "training-fit-library/back/cable-lat-pulldown.png",
+    "destination": "assets/exercises/back/lat_pulldown_close.png",
+    "trainingFitName": "Cable Lat Pulldown",
+    "confidence": 67
+  },
+  "row_cable": {
+    "source": "training-fit-library/back/cable-row.png",
+    "destination": "assets/exercises/back/row_cable.png",
+    "trainingFitName": "Cable Row",
+    "confidence": 100
+  },
+  "row_cable_1arm": {
+    "source": "training-fit-library/back/cable-row.png",
+    "destination": "assets/exercises/back/row_cable_1arm.png",
+    "trainingFitName": "Cable Row",
+    "confidence": 67
+  },
+  "row_db_chest": {
+    "source": "training-fit-library/back/barbell-row.png",
+    "destination": "assets/exercises/back/row_db_chest.png",
+    "trainingFitName": "Barbell Row",
+    "confidence": 33
+  },
+  "row_bb_bent": {
+    "source": "training-fit-library/shoulders/dumbbell-upright-row.png",
+    "destination": "assets/exercises/back/row_bb_bent.png",
+    "trainingFitName": "Dumbbell Upright-Row",
+    "confidence": 67
+  },
+  "row_tbar": {
+    "source": "training-fit-library/back/barbell-row.png",
+    "destination": "assets/exercises/back/row_tbar.png",
+    "trainingFitName": "Barbell Row",
+    "confidence": 50
+  },
+  "row_single_arm": {
+    "source": "training-fit-library/back/barbell-row.png",
+    "destination": "assets/exercises/back/row_single_arm.png",
+    "trainingFitName": "Barbell Row",
+    "confidence": 33
+  },
+  "abs_crunch_cable": {
+    "source": "training-fit-library/abs/ab-wheel-rollout.png",
+    "destination": "assets/exercises/abs/abs_crunch_cable.png",
+    "trainingFitName": "Ab Wheel Rollout",
+    "confidence": 67
+  },
+  "crunch_cable": {
+    "source": "training-fit-library/abs/cable-crunch.png",
+    "destination": "assets/exercises/abs/crunch_cable.png",
+    "trainingFitName": "Cable Crunch",
+    "confidence": 100
+  },
+  "abs_knee_raise": {
+    "source": "training-fit-library/abs/hanging-knee-raise.png",
+    "destination": "assets/exercises/abs/abs_knee_raise.png",
+    "trainingFitName": "Hanging Knee Raise",
+    "confidence": 67
+  },
+  "knee_raise_hanging": {
+    "source": "training-fit-library/abs/hanging-knee-raise.png",
+    "destination": "assets/exercises/abs/knee_raise_hanging.png",
+    "trainingFitName": "Hanging Knee Raise",
+    "confidence": 100
+  },
+  "abs_leg_raise": {
+    "source": "training-fit-library/abs/oblique-leg-raises.png",
+    "destination": "assets/exercises/abs/abs_leg_raise.png",
+    "trainingFitName": "Oblique Leg Raises",
+    "confidence": 67
+  },
+  "abs_plank": {
+    "source": "training-fit-library/abs/ab-wheel-rollout.png",
+    "destination": "assets/exercises/abs/abs_plank.png",
+    "trainingFitName": "Ab Wheel Rollout",
+    "confidence": 33
+  },
+  "abs_russian_twist": {
+    "source": "training-fit-library/abs/ab-wheel-rollout.png",
+    "destination": "assets/exercises/abs/abs_russian_twist.png",
+    "trainingFitName": "Ab Wheel Rollout",
+    "confidence": 33
+  },
+  "situp": {
+    "source": "training-fit-library/abs/sit-ups.png",
+    "destination": "assets/exercises/abs/situp.png",
+    "trainingFitName": "Sit Ups",
+    "confidence": 50
+  },
+  "abs_crunch": {
+    "source": "training-fit-library/abs/abdominal-crunch.png",
+    "destination": "assets/exercises/abs/abs_crunch.png",
+    "trainingFitName": "Abdominal Crunch",
+    "confidence": 50
+  },
+  "squat_barbell": {
+    "source": "training-fit-library/legs/barbell-squats.png",
+    "destination": "assets/exercises/legs/squat_barbell.png",
+    "trainingFitName": "Barbell Squats",
+    "confidence": 100
+  },
+  "squat_hack": {
+    "source": "training-fit-library/legs/hack-squat.png",
+    "destination": "assets/exercises/legs/squat_hack.png",
+    "trainingFitName": "Hack Squat",
+    "confidence": 100
+  },
+  "hack_squat": {
+    "source": "training-fit-library/legs/hack-squat.png",
+    "destination": "assets/exercises/legs/hack_squat.png",
+    "trainingFitName": "Hack Squat",
+    "confidence": 100
+  },
+  "leg_press": {
+    "source": "training-fit-library/legs/seated-leg-press.png",
+    "destination": "assets/exercises/legs/leg_press.png",
+    "trainingFitName": "Seated Leg Press",
+    "confidence": 67
+  },
+  "leg_extension": {
+    "source": "training-fit-library/legs/leg-extensions.png",
+    "destination": "assets/exercises/legs/leg_extension.png",
+    "trainingFitName": "Leg Extensions",
+    "confidence": 100
+  },
+  "squat_front": {
+    "source": "training-fit-library/legs/front-squats.png",
+    "destination": "assets/exercises/legs/squat_front.png",
+    "trainingFitName": "Front Squats",
+    "confidence": 100
+  },
+  "deadlift_romanian": {
+    "source": "training-fit-library/back/dumbbell-romanian-deadlift.png",
+    "destination": "assets/exercises/legs/deadlift_romanian.png",
+    "trainingFitName": "Dumbbell Romanian Deadlift",
+    "confidence": 67
+  },
+  "deadlift_romanian_db": {
+    "source": "training-fit-library/back/dumbbell-romanian-deadlift.png",
+    "destination": "assets/exercises/legs/deadlift_romanian_db.png",
+    "trainingFitName": "Dumbbell Romanian Deadlift",
+    "confidence": 67
+  },
+  "deadlift_conventional": {
+    "source": "training-fit-library/back/cable-deadlift.png",
+    "destination": "assets/exercises/legs/deadlift_conventional.png",
+    "trainingFitName": "Cable Deadlift",
+    "confidence": 50
+  },
+  "leg_curl_lying": {
+    "source": "training-fit-library/legs/lying-leg-curl.png",
+    "destination": "assets/exercises/legs/leg_curl_lying.png",
+    "trainingFitName": "Lying Leg Curl",
+    "confidence": 100
+  },
+  "leg_curl_seated": {
+    "source": "training-fit-library/abs/hanging-leg-curl.png",
+    "destination": "assets/exercises/legs/leg_curl_seated.png",
+    "trainingFitName": "Hanging Leg Curl",
+    "confidence": 67
+  },
+  "leg_curl": {
+    "source": "training-fit-library/abs/hanging-leg-curl.png",
+    "destination": "assets/exercises/legs/leg_curl.png",
+    "trainingFitName": "Hanging Leg Curl",
+    "confidence": 67
+  },
+  "lunge_bulgarian": {
+    "source": "training-fit-library/legs/barbell-lunges.png",
+    "destination": "assets/exercises/legs/lunge_bulgarian.png",
+    "trainingFitName": "Barbell Lunges",
+    "confidence": 50
+  },
+  "lunge_walking": {
+    "source": "training-fit-library/legs/barbell-lunges.png",
+    "destination": "assets/exercises/legs/lunge_walking.png",
+    "trainingFitName": "Barbell Lunges",
+    "confidence": 50
+  },
+  "lunge_barbell": {
+    "source": "training-fit-library/legs/barbell-lunges.png",
+    "destination": "assets/exercises/legs/lunge_barbell.png",
+    "trainingFitName": "Barbell Lunges",
+    "confidence": 100
+  },
+  "hip_thrust": {
+    "source": "training-fit-library/legs/hip-adduction.png",
+    "destination": "assets/exercises/legs/hip_thrust.png",
+    "trainingFitName": "Hip Adduction",
+    "confidence": 50
+  },
+  "hip_thrust_barbell": {
+    "source": "training-fit-library/back/barbell-row.png",
+    "destination": "assets/exercises/legs/hip_thrust_barbell.png",
+    "trainingFitName": "Barbell Row",
+    "confidence": 33
+  },
+  "calf_raise_standing": {
+    "source": "training-fit-library/abs/hanging-knee-raise.png",
+    "destination": "assets/exercises/legs/calf_raise_standing.png",
+    "trainingFitName": "Hanging Knee Raise",
+    "confidence": 33
+  },
+  "calf_raise_seated": {
+    "source": "training-fit-library/abs/hanging-knee-raise.png",
+    "destination": "assets/exercises/legs/calf_raise_seated.png",
+    "trainingFitName": "Hanging Knee Raise",
+    "confidence": 33
+  }
+}
