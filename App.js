@@ -6,10 +6,20 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ErrorBoundary } from './src/components';
 import { useStore } from './src/store';
 
-// Import available screens
+// Import screens
 import { DailyCheckInScreen } from './src/screens/Home/DailyCheckInScreen';
 import { ActiveWorkoutScreen } from './src/screens/Workout/ActiveWorkoutScreen';
 import { CustomWorkoutBuilder } from './src/screens/Workout/CustomWorkoutBuilder';
+
+// Import onboarding screens
+import {
+  WelcomeScreen,
+  NameScreen,
+  StatsScreen,
+  GoalScreen,
+  TrainingDaysScreen,
+  PlanReadyScreen,
+} from './src/screens/Onboarding/OnboardingScreens';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,17 +38,22 @@ function AppContent() {
           screenOptions={{
             headerShown: false,
             contentStyle: { backgroundColor: '#000' },
-            animation: 'slide_from_right'
+            animation: 'slide_from_right',
           }}
-          initialRouteName="DailyCheckIn"
+          initialRouteName={isOnboarded ? 'DailyCheckIn' : 'Welcome'}
         >
-          {/* Daily Check-In - Home Screen */}
+          {/* Onboarding Flow */}
+          <Stack.Screen name="Welcome" component={WelcomeScreen} />
+          <Stack.Screen name="OnboardingName" component={NameScreen} />
+          <Stack.Screen name="OnboardingStats" component={StatsScreen} />
+          <Stack.Screen name="OnboardingGoal" component={GoalScreen} />
+          <Stack.Screen name="OnboardingTrainingDays" component={TrainingDaysScreen} />
+          <Stack.Screen name="OnboardingPlanReady" component={PlanReadyScreen} />
+
+          {/* Main App Screens */}
           <Stack.Screen name="DailyCheckIn" component={DailyCheckInScreen} />
-          
-          {/* Workout Screens */}
           <Stack.Screen name="ActiveWorkout" component={ActiveWorkoutScreen} />
           <Stack.Screen name="CustomWorkout" component={CustomWorkoutBuilder} />
-          
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
