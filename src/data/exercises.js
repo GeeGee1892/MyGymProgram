@@ -7,31 +7,31 @@ export const exerciseDB = {
     name: 'Incline Dumbbell Press',
     muscles: 'Upper chest, front delts',
     cues: ['Set bench to 30° incline', 'Control the negative', 'Full stretch at bottom', 'Press to full lockout'],
-    media: require('../../assets/exercises/chest/chest_press_incline.png')
+    media: require('../../training-fit-library/chest/incline-chest-press.png')
   },
   chest_press_flat_bb: {
     name: 'Flat Bench Press',
     muscles: 'Mid chest, triceps',
     cues: ['Maintain slight arch', 'Touch mid-chest', 'Drive through floor', 'Explosive concentric'],
-    media: require('../../assets/exercises/chest/chest_press_flat_bb.png')
+    media: require('../../training-fit-library/chest/chest-press.png')
   },
   chest_press_flat_db: {
     name: 'Flat Dumbbell Press',
     muscles: 'Mid chest, triceps',
     cues: ['Full range of motion', 'Squeeze at top', 'Palms forward', 'Control descent'],
-    media: require('../../assets/exercises/chest/chest_press_flat_db.png')
+    media: require('../../training-fit-library/chest/chest-press.png')
   },
   chest_press_machine: {
     name: 'Machine Chest Press',
     muscles: 'Chest, triceps',
     cues: ['Adjust seat height', 'Full extension', 'Shoulders back', 'Controlled tempo'],
-    media: require('../../assets/exercises/chest/chest_press_machine.png')
+    media: require('../../training-fit-library/chest/chest-press.png')
   },
   chest_fly_cable: {
     name: 'Cable Fly',
     muscles: 'Chest',
     cues: ['Slight elbow bend throughout', 'Squeeze at center', 'Feel chest stretch', 'Slow eccentric'],
-    media: require('../../assets/exercises/chest/chest_fly_cable.png')
+    media: require('../../training-fit-library/chest/cable-chest-fly.png')
   },
   chest_fly_machine: {
     name: 'Pec Deck',
