@@ -1,0 +1,650 @@
+[
+  {
+    "name": "Ab Wheel Rollout",
+    "filename": "ab-wheel-rollout.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/ab-wheel-rollout/"
+  },
+  {
+    "name": "Abdominal Crunch",
+    "filename": "abdominal-crunch.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/abdominal-crunch/"
+  },
+  {
+    "name": "Abdominal Twist",
+    "filename": "abdominal-twist.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/abdominal-twist/"
+  },
+  {
+    "name": "Banded Mountain Climbers",
+    "filename": "banded-mountain-climbers.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/banded-mountain-climbers/"
+  },
+  {
+    "name": "Bicycle Crunches",
+    "filename": "bicycle-crunches.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/bicycle-crunches/"
+  },
+  {
+    "name": "Cable Crunch",
+    "filename": "cable-crunch.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/cable-crunch/"
+  },
+  {
+    "name": "Cable Lying Knee Tucks",
+    "filename": "cable-lying-knee-tucks.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/cable-lying-knee-tucks/"
+  },
+  {
+    "name": "Crunches",
+    "filename": "crunches.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/crunches/"
+  },
+  {
+    "name": "Decline Sit-Ups",
+    "filename": "decline-sit-ups.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/decline-sit-ups/"
+  },
+  {
+    "name": "Hanging Knee Raise",
+    "filename": "hanging-knee-raise.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/hanging-knee-raise/"
+  },
+  {
+    "name": "Hanging Leg Curl",
+    "filename": "hanging-leg-curl.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/hanging-leg-curl/"
+  },
+  {
+    "name": "Hyperextension Side Bends",
+    "filename": "hyperextension-side-bends.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/hyperextension-side-bends/"
+  },
+  {
+    "name": "Knee Raise",
+    "filename": "knee-raise.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/knee-raise/"
+  },
+  {
+    "name": "Oblique Leg Raises",
+    "filename": "oblique-leg-raises.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/oblique-leg-raises/"
+  },
+  {
+    "name": "Reverse Crunches",
+    "filename": "reverse-crunches.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/reverse-crunches/"
+  },
+  {
+    "name": "Rotary Torso Machine",
+    "filename": "rotary-torso-machine.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/rotary-torso-machine/"
+  },
+  {
+    "name": "Scissor Kicks",
+    "filename": "scissor-kicks.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/scissor-kicks/"
+  },
+  {
+    "name": "Side Bends",
+    "filename": "side-bends.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/side-bends/"
+  },
+  {
+    "name": "Sit Ups",
+    "filename": "sit-ups.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/sit-ups/"
+  },
+  {
+    "name": "Standing Abdominal Twist",
+    "filename": "standing-abdominal-twist.png",
+    "category": "abs",
+    "url": "https://training.fit/exercise/standing-abdominal-twist/"
+  },
+  {
+    "name": "Assisted Pull-Ups",
+    "filename": "assisted-pull-ups.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/assisted-pull-ups/"
+  },
+  {
+    "name": "Back Extension",
+    "filename": "back-extension.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/back-extension/"
+  },
+  {
+    "name": "Band Reverse Fly",
+    "filename": "band-reverse-fly.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/band-reverse-fly/"
+  },
+  {
+    "name": "Banded Good Mornings",
+    "filename": "banded-good-mornings.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/banded-good-mornings/"
+  },
+  {
+    "name": "Barbell Row",
+    "filename": "barbell-row.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/barbell-row/"
+  },
+  {
+    "name": "Cable Deadlift",
+    "filename": "cable-deadlift.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/cable-deadlift/"
+  },
+  {
+    "name": "Cable Lat Pulldown",
+    "filename": "cable-lat-pulldown.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/cable-lat-pulldown/"
+  },
+  {
+    "name": "Cable Lat Pulldown Close Grip",
+    "filename": "cable-lat-pulldown-close-grip.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/cable-lat-pulldown-close-grip/"
+  },
+  {
+    "name": "Cable Row",
+    "filename": "cable-row.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/cable-row/"
+  },
+  {
+    "name": "Deadlift",
+    "filename": "deadlift.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/deadlift/"
+  },
+  {
+    "name": "Dumbbell Deadlift",
+    "filename": "dumbbell-deadlift.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/dumbbell-deadlift/"
+  },
+  {
+    "name": "Dumbbell Romanian Deadlift",
+    "filename": "dumbbell-romanian-deadlift.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/dumbbell-romanian-deadlift/"
+  },
+  {
+    "name": "Good Mornings",
+    "filename": "good-mornings.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/good-mornings/"
+  },
+  {
+    "name": "Hammer Grip Pull-Ups",
+    "filename": "hammer-grip-pull-ups.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/hammer-grip-pull-ups/"
+  },
+  {
+    "name": "Hyperextension on the Bench",
+    "filename": "hyperextension-on-the-bench.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/hyperextension-on-the-bench/"
+  },
+  {
+    "name": "Incline Dumbell Row",
+    "filename": "incline-dumbell-row.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/incline-dumbell-row/"
+  },
+  {
+    "name": "Inverted Row",
+    "filename": "inverted-row.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/inverted-row/"
+  },
+  {
+    "name": "Lat Pulldown on the Machine",
+    "filename": "lat-pulldown-on-the-machine.png",
+    "category": "back",
+    "url": "https://training.fit/exercise/lat-pulldown-on-the-machine/"
+  },
+  {
+    "name": "Barbell Curls",
+    "filename": "barbell-curls.png",
+    "category": "biceps",
+    "url": "https://training.fit/exercise/barbell-curls/"
+  },
+  {
+    "name": "Biceps Curls",
+    "filename": "biceps-curls.png",
+    "category": "biceps",
+    "url": "https://training.fit/exercise/biceps-curls/"
+  },
+  {
+    "name": "Cable Curls",
+    "filename": "cable-curls.png",
+    "category": "biceps",
+    "url": "https://training.fit/exercise/cable-curls/"
+  },
+  {
+    "name": "Concentration Curls",
+    "filename": "concentration-curls.png",
+    "category": "biceps",
+    "url": "https://training.fit/exercise/concentration-curls/"
+  },
+  {
+    "name": "Hammer Curls",
+    "filename": "hammer-curls.png",
+    "category": "biceps",
+    "url": "https://training.fit/exercise/hammer-curls/"
+  },
+  {
+    "name": "High Cable Curls",
+    "filename": "high-cable-curls.png",
+    "category": "biceps",
+    "url": "https://training.fit/exercise/high-cable-curls/"
+  },
+  {
+    "name": "Incline Bench Preacher Curls",
+    "filename": "incline-bench-preacher-curls.png",
+    "category": "biceps",
+    "url": "https://training.fit/exercise/incline-bench-preacher-curls/"
+  },
+  {
+    "name": "Incline Dumbbell Biceps Curls",
+    "filename": "incline-dumbbell-biceps-curls.png",
+    "category": "biceps",
+    "url": "https://training.fit/exercise/incline-dumbbell-biceps-curls/"
+  },
+  {
+    "name": "Neck Lat Pulldown",
+    "filename": "neck-lat-pulldown.png",
+    "category": "biceps",
+    "url": "https://training.fit/exercise/neck-lat-pulldown/"
+  },
+  {
+    "name": "Preacher Curls",
+    "filename": "preacher-curls.png",
+    "category": "biceps",
+    "url": "https://training.fit/exercise/preacher-curls/"
+  },
+  {
+    "name": "Reversed Incline Bench Barbell Curls",
+    "filename": "reversed-incline-bench-barbell-curls.png",
+    "category": "biceps",
+    "url": "https://training.fit/exercise/reversed-incline-bench-barbell-curls/"
+  },
+  {
+    "name": "Seated Machine Row",
+    "filename": "seated-machine-row.png",
+    "category": "biceps",
+    "url": "https://training.fit/exercise/seated-machine-row/"
+  },
+  {
+    "name": "Barbell Lunges",
+    "filename": "barbell-lunges.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/barbell-lunges/"
+  },
+  {
+    "name": "Barbell Squats",
+    "filename": "barbell-squats.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/barbell-squats/"
+  },
+  {
+    "name": "Barbell Step-Ups",
+    "filename": "barbell-step-ups.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/barbell-step-ups/"
+  },
+  {
+    "name": "Cable Hip Adduction",
+    "filename": "cable-hip-adduction.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/cable-hip-adduction/"
+  },
+  {
+    "name": "Dumbbell Lunges",
+    "filename": "dumbbell-lunges.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/dumbbell-lunges/"
+  },
+  {
+    "name": "Dumbbell Squats",
+    "filename": "dumbbell-squats.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/dumbbell-squats/"
+  },
+  {
+    "name": "Front Squats",
+    "filename": "front-squats.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/front-squats/"
+  },
+  {
+    "name": "Hack Squat",
+    "filename": "hack-squat.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/hack-squat/"
+  },
+  {
+    "name": "Hip Adduction",
+    "filename": "hip-adduction.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/hip-adduction/"
+  },
+  {
+    "name": "Leg Extensions",
+    "filename": "leg-extensions.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/leg-extensions/"
+  },
+  {
+    "name": "Lunges",
+    "filename": "lunges.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/lunges/"
+  },
+  {
+    "name": "Lying Leg Curl",
+    "filename": "lying-leg-curl.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/lying-leg-curl/"
+  },
+  {
+    "name": "Resistance Band Deadlift",
+    "filename": "resistance-band-deadlift.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/resistance-band-deadlift/"
+  },
+  {
+    "name": "Seated Leg Press",
+    "filename": "seated-leg-press.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/seated-leg-press/"
+  },
+  {
+    "name": "Side Lunge",
+    "filename": "side-lunge.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/side-lunge/"
+  },
+  {
+    "name": "Squats",
+    "filename": "squats.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/squats/"
+  },
+  {
+    "name": "Step Ups",
+    "filename": "step-ups.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/step-ups/"
+  },
+  {
+    "name": "Step-Ups Sideways with Dumbbells",
+    "filename": "step-ups-sideways-with-dumbbells.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/step-ups-sideways-with-dumbbells/"
+  },
+  {
+    "name": "Sumo Deadlift",
+    "filename": "sumo-deadlift.png",
+    "category": "legs",
+    "url": "https://training.fit/exercise/sumo-deadlift/"
+  },
+  {
+    "name": "Bench Dip",
+    "filename": "bench-dip.png",
+    "category": "chest",
+    "url": "https://training.fit/exercise/bench-dip/"
+  },
+  {
+    "name": "Cable Chest Fly",
+    "filename": "cable-chest-fly.png",
+    "category": "chest",
+    "url": "https://training.fit/exercise/cable-chest-fly/"
+  },
+  {
+    "name": "Chest Press",
+    "filename": "chest-press.png",
+    "category": "chest",
+    "url": "https://training.fit/exercise/chest-press/"
+  },
+  {
+    "name": "Close-Grip Bench Press",
+    "filename": "close-grip-bench-press.png",
+    "category": "chest",
+    "url": "https://training.fit/exercise/close-grip-bench-press/"
+  },
+  {
+    "name": "Decline Bench Press",
+    "filename": "decline-bench-press.png",
+    "category": "chest",
+    "url": "https://training.fit/exercise/decline-bench-press/"
+  },
+  {
+    "name": "Decline Dumbbell Bench Press",
+    "filename": "decline-dumbbell-bench-press.png",
+    "category": "chest",
+    "url": "https://training.fit/exercise/decline-dumbbell-bench-press/"
+  },
+  {
+    "name": "Decline Flys",
+    "filename": "decline-flys.png",
+    "category": "chest",
+    "url": "https://training.fit/exercise/decline-flys/"
+  },
+  {
+    "name": "Decline Push-Ups",
+    "filename": "decline-push-ups.png",
+    "category": "chest",
+    "url": "https://training.fit/exercise/decline-push-ups/"
+  },
+  {
+    "name": "Dips",
+    "filename": "dips.png",
+    "category": "chest",
+    "url": "https://training.fit/exercise/dips/"
+  },
+  {
+    "name": "Dumbbell Bench Press",
+    "filename": "dumbbell-bench-press.png",
+    "category": "chest",
+    "url": "https://training.fit/exercise/dumbbell-bench-press/"
+  },
+  {
+    "name": "Dumbbell Floor Flys",
+    "filename": "dumbbell-floor-flys.png",
+    "category": "chest",
+    "url": "https://training.fit/exercise/dumbbell-floor-flys/"
+  },
+  {
+    "name": "Flys",
+    "filename": "flys.png",
+    "category": "chest",
+    "url": "https://training.fit/exercise/flys/"
+  },
+  {
+    "name": "Incline Barbell Press",
+    "filename": "incline-barbell-press.png",
+    "category": "chest",
+    "url": "https://training.fit/exercise/incline-barbell-press/"
+  },
+  {
+    "name": "Incline Cable Fly",
+    "filename": "incline-cable-fly.png",
+    "category": "chest",
+    "url": "https://training.fit/exercise/incline-cable-fly/"
+  },
+  {
+    "name": "Incline Chest Press",
+    "filename": "incline-chest-press.png",
+    "category": "chest",
+    "url": "https://training.fit/exercise/incline-chest-press/"
+  },
+  {
+    "name": "Incline Dumbbell Fly",
+    "filename": "incline-dumbbell-fly.png",
+    "category": "chest",
+    "url": "https://training.fit/exercise/incline-dumbbell-fly/"
+  },
+  {
+    "name": "Incline Dumbbell Press",
+    "filename": "incline-dumbbell-press.png",
+    "category": "chest",
+    "url": "https://training.fit/exercise/incline-dumbbell-press/"
+  },
+  {
+    "name": "Arnold Press",
+    "filename": "arnold-press.png",
+    "category": "shoulders",
+    "url": "https://training.fit/exercise/arnold-press/"
+  },
+  {
+    "name": "Barbell Front Raise",
+    "filename": "barbell-front-raise.png",
+    "category": "shoulders",
+    "url": "https://training.fit/exercise/barbell-front-raise/"
+  },
+  {
+    "name": "Behind-The-Neck Overhead Press",
+    "filename": "behind-the-neck-overhead-press.png",
+    "category": "shoulders",
+    "url": "https://training.fit/exercise/behind-the-neck-overhead-press/"
+  },
+  {
+    "name": "Dumbbell Shoulder Press",
+    "filename": "dumbbell-shoulder-press.png",
+    "category": "shoulders",
+    "url": "https://training.fit/exercise/dumbbell-shoulder-press/"
+  },
+  {
+    "name": "Dumbbell Upright-Row",
+    "filename": "dumbbell-upright-row.png",
+    "category": "shoulders",
+    "url": "https://training.fit/exercise/dumbbell-upright-row/"
+  },
+  {
+    "name": "Front Raise",
+    "filename": "front-raise.png",
+    "category": "shoulders",
+    "url": "https://training.fit/exercise/front-raise/"
+  },
+  {
+    "name": "Lateral Raise",
+    "filename": "lateral-raise.png",
+    "category": "shoulders",
+    "url": "https://training.fit/exercise/lateral-raise/"
+  },
+  {
+    "name": "Resistance Band Row",
+    "filename": "resistance-band-row.png",
+    "category": "shoulders",
+    "url": "https://training.fit/exercise/resistance-band-row/"
+  },
+  {
+    "name": "Resistance Band Upright-Row",
+    "filename": "resistance-band-upright-row.png",
+    "category": "shoulders",
+    "url": "https://training.fit/exercise/resistance-band-upright-row/"
+  },
+  {
+    "name": "Reverse Butterfly",
+    "filename": "reverse-butterfly.png",
+    "category": "shoulders",
+    "url": "https://training.fit/exercise/reverse-butterfly/"
+  },
+  {
+    "name": "Reverse Flys",
+    "filename": "reverse-flys.png",
+    "category": "shoulders",
+    "url": "https://training.fit/exercise/reverse-flys/"
+  },
+  {
+    "name": "Seated Shoulder Press with Resistance Band",
+    "filename": "seated-shoulder-press-with-resistance-band.png",
+    "category": "shoulders",
+    "url": "https://training.fit/exercise/seated-shoulder-press-with-resistance-band/"
+  },
+  {
+    "name": "Barbell Skull Crusher",
+    "filename": "barbell-skull-crusher.png",
+    "category": "triceps",
+    "url": "https://training.fit/exercise/barbell-skull-crusher/"
+  },
+  {
+    "name": "Cable Tricep Pushdowns",
+    "filename": "cable-tricep-pushdowns.png",
+    "category": "triceps",
+    "url": "https://training.fit/exercise/cable-tricep-pushdowns/"
+  },
+  {
+    "name": "Dumbbell Seated Overhead Tricep Extension",
+    "filename": "dumbbell-seated-overhead-tricep-extension.png",
+    "category": "triceps",
+    "url": "https://training.fit/exercise/dumbbell-seated-overhead-tricep-extension/"
+  },
+  {
+    "name": "Dumbbell Skullcrusher",
+    "filename": "dumbbell-skullcrusher.png",
+    "category": "triceps",
+    "url": "https://training.fit/exercise/dumbbell-skullcrusher/"
+  },
+  {
+    "name": "Dumbbell Tricep Extension",
+    "filename": "dumbbell-tricep-extension.png",
+    "category": "triceps",
+    "url": "https://training.fit/exercise/dumbbell-tricep-extension/"
+  },
+  {
+    "name": "Kickbacks",
+    "filename": "kickbacks.png",
+    "category": "triceps",
+    "url": "https://training.fit/exercise/kickbacks/"
+  },
+  {
+    "name": "One Arm Overhead Tricep Extension",
+    "filename": "one-arm-overhead-tricep-extension.png",
+    "category": "triceps",
+    "url": "https://training.fit/exercise/one-arm-overhead-tricep-extension/"
+  },
+  {
+    "name": "Overhead Tricep Extension",
+    "filename": "overhead-tricep-extension.png",
+    "category": "triceps",
+    "url": "https://training.fit/exercise/overhead-tricep-extension/"
+  },
+  {
+    "name": "Push-Ups",
+    "filename": "push-ups.png",
+    "category": "triceps",
+    "url": "https://training.fit/exercise/push-ups/"
+  },
+  {
+    "name": "Triceps Cable Kickbacks",
+    "filename": "triceps-cable-kickbacks.png",
+    "category": "triceps",
+    "url": "https://training.fit/exercise/triceps-cable-kickbacks/"
+  }
+]
