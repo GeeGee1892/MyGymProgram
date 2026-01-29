@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { useStore } from '../../store';
-import { spacing, colors, radius, fontSize, fontWeight } from '../../utils/theme';
+import { useStore } from '../store';
+import { spacing, colors, radius, fontSize, fontWeight } from '../utils/theme';
 
 export const CalorieAnalytics = () => {
   const { dailyCheckIns, userData } = useStore();

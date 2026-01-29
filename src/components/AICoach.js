@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
-import { useStore } from '../../store';
-import { spacing, colors, radius, fontSize, fontWeight } from '../../utils/theme';
-import { calcVolume, fmtDate } from '../../utils';
+import { useStore } from '../store';
+import { spacing, colors, radius, fontSize, fontWeight } from '../utils/theme';
+import { calcVolume, fmtDate } from '../utils';
 
 export const AICoach = () => {
   const { userData, workoutHistory, dailyCheckIns, weeklyReviews } = useStore();
