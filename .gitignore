@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+.expo-shared/
+
+# Metro / RN
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+metro-cache/
+.cache/
+
+# build outputs
+dist/
+web-build/
+build/
+
+# misc
+.DS_Store
+.env
+.env.*
