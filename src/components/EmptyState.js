@@ -1,79 +1,54 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Button } from './Button';
+import { colors, radius, spacing, fontSize, fontWeight } from '../utils/theme';
 
 export const EmptyState = ({ 
-  icon = '💪',
-  title,
-  message,
-  actionLabel,
-  onAction,
-  secondaryActionLabel,
-  onSecondaryAction,
-}) => {
-  return (
-    <View style={styles.container}>
-      <View style={styles.iconContainer}>
-        <Text style={styles.icon}>{icon}</Text>
-      </View>
-      
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.message}>{message}</Text>
-      
-      {onAction && (
-        <Button onPress={onAction} style={styles.button}>
-          {actionLabel}
-        </Button>
-      )}
-      
-      {onSecondaryAction && (
-        <Button variant="ghost" onPress={onSecondaryAction} style={styles.secondaryButton}>
-          {secondaryActionLabel}
-        </Button>
-      )}
-    </View>
-  );
-};
+  icon = '📭', 
+  title, 
+  message, 
+  actionLabel, 
+  onAction 
+}) => (
+  <View style={styles.container}>
+    <Text style={styles.icon}>{icon}</Text>
+    <Text style={styles.title}>{title}</Text>
+    {message && <Text style={styles.message}>{message}</Text>}
+    {actionLabel && onAction && (
+      <Button variant="secondary" size="sm" onPress={onAction} style={styles.button}>
+        {actionLabel}
+      </Button>
+    )}
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 40,
-  },
-  iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#18181b',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
+    padding: spacing.xxxl,
   },
   icon: {
-    fontSize: 40,
+    fontSize: 48,
+    marginBottom: spacing.lg,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 12,
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.semibold,
+    color: colors.textPrimary,
     textAlign: 'center',
-    letterSpacing: 0.3,
+    marginBottom: spacing.sm,
   },
   message: {
-    fontSize: 16,
-    color: '#a1a1aa',
+    fontSize: fontSize.base,
+    color: colors.textTertiary,
     textAlign: 'center',
-    marginBottom: 32,
-    lineHeight: 24,
+    marginBottom: spacing.xxl,
   },
   button: {
-    width: '100%',
-    maxWidth: 280,
-  },
-  secondaryButton: {
-    marginTop: 12,
+    marginTop: spacing.md,
   },
 });
+
+export default EmptyState;

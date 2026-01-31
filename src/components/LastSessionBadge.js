@@ -1,35 +1,39 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { fmtDate } from '../utils';
+import { colors, radius, spacing, fontSize, fontWeight } from '../utils/theme';
+import { fmtDate, fmtRelativeTime } from '../utils/formatting';
 
 export const LastSessionBadge = ({ lastSession }) => {
   if (!lastSession) return null;
   
-  const { commonWeight, commonReps, date, sets } = lastSession;
+  const { date, maxWeight, avgReps, sets } = lastSession;
   
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.label}>LAST TIME</Text>
-        <Text style={styles.date}>{fmtDate(date)}</Text>
+        <Text style={styles.icon}>📋</Text>
+        <Text style={styles.title}>Last Session</Text>
+        <Text style={styles.date}>{fmtRelativeTime(date)}</Text>
       </View>
-      
       <View style={styles.stats}>
         <View style={styles.stat}>
-          <Text style={styles.statValue}>{commonReps}</Text>
-          <Text style={styles.statLabel}>reps</Text>
+          <Text style={styles.statValue}>{maxWeight}kg</Text>
+          <Text style={styles.statLabel}>max</Text>
         </View>
-        
-        <Text style={styles.separator}>×</Text>
-        
+        <View style={styles.divider} />
         <View style={styles.stat}>
-          <Text style={styles.statValue}>{commonWeight}</Text>
-          <Text style={styles.statLabel}>kg</Text>
+          <Text style={styles.statValue}>{avgReps}</Text>
+          <Text style={styles.statLabel}>avg reps</Text>
         </View>
-        
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{sets.length} sets</Text>
-        </View>
+        {sets && (
+          <>
+            <View style={styles.divider} />
+            <View style={styles.stat}>
+              <Text style={styles.statValue}>{sets.length}</Text>
+              <Text style={styles.statLabel}>sets</Text>
+            </View>
+          </>
+        )}
       </View>
     </View>
   );
@@ -37,62 +41,58 @@ export const LastSessionBadge = ({ lastSession }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'rgba(16, 185, 129, 0.05)',
-    borderRadius: 12,
-    padding: 12,
+    backgroundColor: 'rgba(59, 130, 246, 0.08)',
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
     borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.2)',
-    marginBottom: 16,
+    borderColor: 'rgba(59, 130, 246, 0.2)',
+    alignSelf: 'stretch',
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
-  label: {
-    fontSize: 11,
-    fontWeight: '600',
+  icon: {
+    fontSize: 16,
+    marginRight: spacing.sm,
+  },
+  title: {
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.semibold,
+    color: '#3b82f6',
     letterSpacing: 0.5,
-    color: '#10b981',
+    flex: 1,
   },
   date: {
-    fontSize: 11,
-    color: '#71717a',
+    fontSize: fontSize.xs,
+    color: colors.textDisabled,
   },
   stats: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    justifyContent: 'center',
   },
   stat: {
     alignItems: 'center',
+    paddingHorizontal: spacing.lg,
   },
   statValue: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#fff',
-    lineHeight: 28,
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
   },
   statLabel: {
-    fontSize: 11,
-    color: '#a1a1aa',
+    fontSize: fontSize.xs,
+    color: colors.textDisabled,
+    marginTop: 2,
   },
-  separator: {
-    fontSize: 20,
-    color: '#52525b',
-    fontWeight: '300',
-  },
-  badge: {
-    backgroundColor: '#27272a',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-    marginLeft: 'auto',
-  },
-  badgeText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#a1a1aa',
+  divider: {
+    width: 1,
+    height: 30,
+    backgroundColor: 'rgba(59, 130, 246, 0.2)',
   },
 });
+
+export default LastSessionBadge;
