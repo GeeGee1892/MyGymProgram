@@ -1,226 +1,297 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { 
+  View, Text, TouchableOpacity, ScrollView, SafeAreaView, 
+  StyleSheet, TextInput, Alert 
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useStore } from '../../store';
+import { Button } from '../../components';
 import { exerciseDB } from '../../data';
-import { Button, EmptyState } from '../../components';
 import { spacing, colors, radius, fontSize, fontWeight } from '../../utils/theme';
 
-export const CustomWorkoutBuilder = ({ navigation }) => {
+export const CustomWorkoutBuilder = () => {
+  const navigation = useNavigation();
   const { startWorkout } = useStore();
   
-  const [workoutName, setWorkoutName] = useState('');
   const [selectedExercises, setSelectedExercises] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterMuscle, setFilterMuscle] = useState('All');
+  const [muscleFilter, setMuscleFilter] = useState('All');
   
-  // Filter exercises based on search and muscle group
-  const allExercises = Object.keys(exerciseDB).map(id => ({
-    id,
-    ...exerciseDB[id],
-  }));
+  // Get all exercises from exerciseDB
+  const allExercises = useMemo(() => {
+    return Object.entries(exerciseDB).map(([id, data]) => ({
+      id,
+      name: data.name,
+      muscles: data.muscles,
+    }));
+  }, []);
   
-  const filteredExercises = allExercises.filter(ex => {
-    const matchesSearch = ex.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesMuscle = filterMuscle === 'All' || ex.muscles.toLowerCase().includes(filterMuscle.toLowerCase());
-    return matchesSearch && matchesMuscle;
-  });
-  
+  // FIXED: Improved muscle filter logic
   const muscleGroups = ['All', 'Chest', 'Back', 'Shoulders', 'Arms', 'Legs', 'Core'];
   
-  // Add exercise to workout
-  const addExercise = (exercise) => {
-    const newEx = {
-      id: exercise.id,
-      sets: 3,
-      reps: '8-12',
-    };
-    setSelectedExercises([...selectedExercises, newEx]);
+  const getMuscleMatch = (muscles, filter) => {
+    if (filter === 'All') return true;
+    if (!muscles) return false;
+    
+    const musclesLower = muscles.toLowerCase();
+    
+    // Special handling for "Arms" to match biceps, triceps, and forearms
+    if (filter === 'Arms') {
+      return musclesLower.includes('bicep') || 
+             musclesLower.includes('tricep') || 
+             musclesLower.includes('forearm');
+    }
+    
+    // Special handling for "Core"
+    if (filter === 'Core') {
+      return musclesLower.includes('ab') || 
+             musclesLower.includes('core') || 
+             musclesLower.includes('oblique');
+    }
+    
+    return musclesLower.includes(filter.toLowerCase());
   };
   
-  // Remove exercise from workout
-  const removeExercise = (index) => {
-    const updated = [...selectedExercises];
-    updated.splice(index, 1);
-    setSelectedExercises(updated);
+  // Filter exercises
+  const filteredExercises = useMemo(() => {
+    return allExercises.filter(ex => {
+      const matchesSearch = !searchQuery || 
+        ex.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        ex.muscles?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesMuscle = getMuscleMatch(ex.muscles, muscleFilter);
+      
+      return matchesSearch && matchesMuscle;
+    });
+  }, [allExercises, searchQuery, muscleFilter]);
+  
+  // Toggle exercise selection
+  const toggleExercise = (exercise) => {
+    setSelectedExercises(prev => {
+      const exists = prev.find(e => e.id === exercise.id);
+      if (exists) {
+        return prev.filter(e => e.id !== exercise.id);
+      }
+      return [...prev, { ...exercise, sets: 3, reps: '8-12' }];
+    });
   };
   
-  // Update sets/reps for an exercise
-  const updateExercise = (index, field, value) => {
-    const updated = [...selectedExercises];
-    updated[index] = { ...updated[index], [field]: value };
-    setSelectedExercises(updated);
+  // Update sets for selected exercise
+  const updateSets = (exerciseId, sets) => {
+    const setsNum = parseInt(sets, 10);
+    if (isNaN(setsNum) || setsNum < 1 || setsNum > 10) return;
+    
+    setSelectedExercises(prev => 
+      prev.map(e => e.id === exerciseId ? { ...e, sets: setsNum } : e)
+    );
   };
   
-  // Start the custom workout
-  const handleStart = () => {
+  // Move exercise up/down in order
+  const moveExercise = (index, direction) => {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= selectedExercises.length) return;
+    
+    setSelectedExercises(prev => {
+      const newArr = [...prev];
+      [newArr[index], newArr[newIndex]] = [newArr[newIndex], newArr[index]];
+      return newArr;
+    });
+  };
+  
+  // Remove exercise from selection
+  const removeExercise = (exerciseId) => {
+    setSelectedExercises(prev => prev.filter(e => e.id !== exerciseId));
+  };
+  
+  // Start custom workout
+  const handleStartWorkout = () => {
     if (selectedExercises.length === 0) {
-      alert('Please add at least one exercise');
+      // FIXED: Use Alert.alert instead of alert()
+      Alert.alert('No Exercises', 'Please select at least one exercise for your workout.');
       return;
     }
     
-    startWorkout('Custom', selectedExercises);
+    // Format exercises for workout
+    const formattedExercises = selectedExercises.map(e => ({
+      id: e.id,
+      sets: e.sets,
+      reps: e.reps,
+    }));
+    
+    startWorkout('Custom', formattedExercises);
+    
+    // FIXED: Navigate properly from tab to stack
     navigation.navigate('ActiveWorkout', { type: 'Custom' });
   };
+  
+  // Clear selection
+  const handleClear = () => {
+    if (selectedExercises.length > 0) {
+      Alert.alert(
+        'Clear Selection',
+        'Remove all selected exercises?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Clear', style: 'destructive', onPress: () => setSelectedExercises([]) },
+        ]
+      );
+    }
+  };
+  
+  const isSelected = (exerciseId) => selectedExercises.some(e => e.id === exerciseId);
+  const totalSets = selectedExercises.reduce((sum, e) => sum + e.sets, 0);
   
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>Build Custom Workout</Text>
-      </View>
-      
-      <ScrollView style={styles.content}>
-        {/* Workout Name */}
-        <View style={styles.section}>
-          <Text style={styles.label}>Workout Name (Optional)</Text>
-          <TextInput
-            style={styles.input}
-            value={workoutName}
-            onChangeText={setWorkoutName}
-            placeholder="e.g., Upper Body Power"
-            placeholderTextColor={colors.textDisabled}
-          />
-        </View>
-        
-        {/* Selected Exercises */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            Your Workout ({selectedExercises.length} exercises)
-          </Text>
-          
-          {selectedExercises.length === 0 ? (
-            <View style={styles.emptyWorkout}>
-              <Text style={styles.emptyText}>No exercises added yet</Text>
-              <Text style={styles.emptyHint}>Search and tap exercises below to add them</Text>
-            </View>
-          ) : (
-            selectedExercises.map((ex, index) => {
-              const data = exerciseDB[ex.id];
-              return (
-                <View key={index} style={styles.selectedExercise}>
-                  <View style={styles.exerciseInfo}>
-                    <Text style={styles.exerciseName}>{data.name}</Text>
-                    <Text style={styles.exerciseMuscle}>{data.muscles}</Text>
-                  </View>
-                  
-                  <View style={styles.exerciseControls}>
-                    <View style={styles.controlGroup}>
-                      <Text style={styles.controlLabel}>Sets</Text>
-                      <TextInput
-                        style={styles.controlInput}
-                        value={ex.sets.toString()}
-                        onChangeText={(val) => updateExercise(index, 'sets', parseInt(val) || 3)}
-                        keyboardType="numeric"
-                      />
-                    </View>
-                    
-                    <View style={styles.controlGroup}>
-                      <Text style={styles.controlLabel}>Reps</Text>
-                      <TextInput
-                        style={styles.controlInput}
-                        value={ex.reps}
-                        onChangeText={(val) => updateExercise(index, 'reps', val)}
-                        placeholder="8-12"
-                      />
-                    </View>
-                    
-                    <TouchableOpacity
-                      style={styles.removeButton}
-                      onPress={() => removeExercise(index)}
-                    >
-                      <Text style={styles.removeButtonText}>✕</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              );
-            })
+        <View style={styles.headerTop}>
+          <Text style={styles.title}>Build Workout</Text>
+          {selectedExercises.length > 0 && (
+            <TouchableOpacity onPress={handleClear}>
+              <Text style={styles.clearText}>Clear</Text>
+            </TouchableOpacity>
           )}
         </View>
-        
-        {/* Exercise Library */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Exercise Library</Text>
-          
-          {/* Search */}
-          <TextInput
-            style={styles.searchInput}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholder="Search exercises..."
-            placeholderTextColor={colors.textDisabled}
-          />
-          
-          {/* Muscle Filter */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.filterScroll}
+        <Text style={styles.subtitle}>
+          {selectedExercises.length} exercises · {totalSets} sets
+        </Text>
+      </View>
+      
+      {/* Search */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder="Search exercises..."
+          placeholderTextColor={colors.textDisabled}
+        />
+      </View>
+      
+      {/* Muscle filter */}
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        style={styles.filterScroll}
+        contentContainerStyle={styles.filterContainer}
+      >
+        {muscleGroups.map((muscle) => (
+          <TouchableOpacity
+            key={muscle}
+            style={[styles.filterChip, muscleFilter === muscle && styles.filterChipActive]}
+            onPress={() => setMuscleFilter(muscle)}
           >
-            {muscleGroups.map((muscle) => (
-              <TouchableOpacity
-                key={muscle}
-                style={[
-                  styles.filterButton,
-                  filterMuscle === muscle && styles.filterButtonActive,
-                ]}
-                onPress={() => setFilterMuscle(muscle)}
-              >
-                <Text
-                  style={[
-                    styles.filterButtonText,
-                    filterMuscle === muscle && styles.filterButtonTextActive,
-                  ]}
-                >
-                  {muscle}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-          
-          {/* Exercise List */}
-          {filteredExercises.map((ex) => {
-            const isAdded = selectedExercises.some((sel) => sel.id === ex.id);
-            
-            return (
-              <TouchableOpacity
-                key={ex.id}
-                style={[
-                  styles.exerciseCard,
-                  isAdded && styles.exerciseCardAdded,
-                ]}
-                onPress={() => !isAdded && addExercise(ex)}
-                disabled={isAdded}
-              >
-                <View style={styles.exerciseCardContent}>
-                  <Text style={styles.exerciseCardName}>{ex.name}</Text>
-                  <Text style={styles.exerciseCardMuscle}>{ex.muscles}</Text>
-                </View>
-                {isAdded ? (
-                  <View style={styles.addedBadge}>
-                    <Text style={styles.addedBadgeText}>✓ Added</Text>
-                  </View>
-                ) : (
-                  <View style={styles.addButton}>
-                    <Text style={styles.addButtonText}>+ Add</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+            <Text style={[styles.filterText, muscleFilter === muscle && styles.filterTextActive]}>
+              {muscle}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </ScrollView>
       
-      {/* Bottom Bar */}
-      {selectedExercises.length > 0 && (
-        <View style={styles.bottomBar}>
-          <Button onPress={handleStart} style={styles.startButton}>
-            Start Workout ({selectedExercises.length} exercises)
-          </Button>
+      {/* Two-column layout */}
+      <View style={styles.mainContent}>
+        {/* Exercise list */}
+        <View style={styles.exerciseListContainer}>
+          <Text style={styles.sectionTitle}>EXERCISES</Text>
+          <ScrollView style={styles.exerciseList} showsVerticalScrollIndicator={false}>
+            {filteredExercises.map((exercise) => (
+              <TouchableOpacity
+                key={exercise.id}
+                style={[styles.exerciseItem, isSelected(exercise.id) && styles.exerciseItemSelected]}
+                onPress={() => toggleExercise(exercise)}
+              >
+                <View style={styles.exerciseCheckbox}>
+                  {isSelected(exercise.id) && <Text style={styles.checkmark}>✓</Text>}
+                </View>
+                <View style={styles.exerciseInfo}>
+                  <Text style={[styles.exerciseName, isSelected(exercise.id) && styles.exerciseNameSelected]}>
+                    {exercise.name}
+                  </Text>
+                  <Text style={styles.exerciseMuscle}>{exercise.muscles}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+            {filteredExercises.length === 0 && (
+              <View style={styles.emptySearch}>
+                <Text style={styles.emptySearchText}>No exercises found</Text>
+              </View>
+            )}
+          </ScrollView>
         </View>
-      )}
+        
+        {/* Selected exercises */}
+        <View style={styles.selectedContainer}>
+          <Text style={styles.sectionTitle}>YOUR WORKOUT</Text>
+          {selectedExercises.length > 0 ? (
+            <ScrollView style={styles.selectedList} showsVerticalScrollIndicator={false}>
+              {selectedExercises.map((exercise, index) => (
+                <View key={exercise.id} style={styles.selectedItem}>
+                  <View style={styles.selectedHeader}>
+                    <Text style={styles.selectedNumber}>{index + 1}</Text>
+                    <Text style={styles.selectedName} numberOfLines={1}>
+                      {exercise.name}
+                    </Text>
+                    <TouchableOpacity onPress={() => removeExercise(exercise.id)}>
+                      <Text style={styles.removeBtn}>✕</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.selectedControls}>
+                    <View style={styles.setsControl}>
+                      <TouchableOpacity 
+                        style={styles.setsBtn}
+                        onPress={() => updateSets(exercise.id, exercise.sets - 1)}
+                      >
+                        <Text style={styles.setsBtnText}>−</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.setsValue}>{exercise.sets} sets</Text>
+                      <TouchableOpacity 
+                        style={styles.setsBtn}
+                        onPress={() => updateSets(exercise.id, exercise.sets + 1)}
+                      >
+                        <Text style={styles.setsBtnText}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={styles.orderControls}>
+                      <TouchableOpacity 
+                        onPress={() => moveExercise(index, -1)}
+                        disabled={index === 0}
+                      >
+                        <Text style={[styles.orderBtn, index === 0 && styles.orderBtnDisabled]}>↑</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity 
+                        onPress={() => moveExercise(index, 1)}
+                        disabled={index === selectedExercises.length - 1}
+                      >
+                        <Text style={[
+                          styles.orderBtn, 
+                          index === selectedExercises.length - 1 && styles.orderBtnDisabled
+                        ]}>↓</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          ) : (
+            <View style={styles.emptySelection}>
+              <Text style={styles.emptyEmoji}>👈</Text>
+              <Text style={styles.emptyTitle}>No exercises yet</Text>
+              <Text style={styles.emptySubtext}>Tap exercises on the left to add them</Text>
+            </View>
+          )}
+        </View>
+      </View>
+      
+      {/* Start button */}
+      <View style={styles.footer}>
+        <Button 
+          onPress={handleStartWorkout} 
+          disabled={selectedExercises.length === 0}
+        >
+          Start Workout ({totalSets} sets)
+        </Button>
+      </View>
     </SafeAreaView>
   );
 };
@@ -231,213 +302,249 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
     paddingHorizontal: spacing.xxl,
-    paddingVertical: spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    paddingTop: spacing.xxl,
+    paddingBottom: spacing.md,
   },
-  backButton: {
-    fontSize: fontSize.md,
-    color: colors.primary,
-    marginRight: spacing.lg,
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   title: {
-    fontSize: fontSize.xl,
+    fontSize: fontSize.xxl,
     fontWeight: fontWeight.bold,
     color: colors.textPrimary,
   },
-  content: {
-    flex: 1,
+  clearText: {
+    fontSize: fontSize.base,
+    color: colors.danger,
   },
-  section: {
-    padding: spacing.xxl,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  label: {
+  subtitle: {
     fontSize: fontSize.sm,
     color: colors.textTertiary,
-    marginBottom: spacing.sm,
-    fontWeight: fontWeight.semibold,
+    marginTop: spacing.xs,
   },
-  input: {
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    padding: spacing.lg,
-    fontSize: fontSize.md,
-    color: colors.textPrimary,
-  },
-  sectionTitle: {
-    fontSize: fontSize.lg,
-    fontWeight: fontWeight.bold,
-    color: colors.textPrimary,
-    marginBottom: spacing.lg,
-  },
-  emptyWorkout: {
-    alignItems: 'center',
-    paddingVertical: spacing.xxxl,
-  },
-  emptyText: {
-    fontSize: fontSize.md,
-    color: colors.textTertiary,
-    marginBottom: spacing.sm,
-  },
-  emptyHint: {
-    fontSize: fontSize.sm,
-    color: colors.textMuted,
-  },
-  selectedExercise: {
-    backgroundColor: colors.card,
-    borderRadius: radius.md,
-    padding: spacing.lg,
+  searchContainer: {
+    paddingHorizontal: spacing.xxl,
     marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  exerciseInfo: {
-    marginBottom: spacing.md,
-  },
-  exerciseName: {
-    fontSize: fontSize.md,
-    fontWeight: fontWeight.semibold,
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-  },
-  exerciseMuscle: {
-    fontSize: fontSize.sm,
-    color: colors.textTertiary,
-  },
-  exerciseControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  controlGroup: {
-    flex: 1,
-  },
-  controlLabel: {
-    fontSize: fontSize.xs,
-    color: colors.textMuted,
-    marginBottom: spacing.xs,
-    fontWeight: fontWeight.semibold,
-  },
-  controlInput: {
-    backgroundColor: colors.elevated,
-    borderRadius: radius.sm,
-    padding: spacing.sm,
-    fontSize: fontSize.md,
-    color: colors.textPrimary,
-    textAlign: 'center',
-  },
-  removeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: radius.sm,
-    backgroundColor: colors.danger,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  removeButtonText: {
-    fontSize: fontSize.lg,
-    color: colors.textPrimary,
   },
   searchInput: {
     backgroundColor: colors.card,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    fontSize: fontSize.base,
+    color: colors.textPrimary,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: radius.md,
-    padding: spacing.lg,
-    fontSize: fontSize.md,
-    color: colors.textPrimary,
-    marginBottom: spacing.lg,
   },
   filterScroll: {
-    marginBottom: spacing.lg,
+    maxHeight: 44,
+    marginBottom: spacing.md,
   },
-  filterButton: {
+  filterContainer: {
+    paddingHorizontal: spacing.xxl,
+    gap: spacing.sm,
+  },
+  filterChip: {
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
-    borderRadius: radius.md,
+    borderRadius: radius.full,
     backgroundColor: colors.card,
-    marginRight: spacing.sm,
     borderWidth: 1,
     borderColor: colors.border,
   },
-  filterButtonActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+  filterChipActive: {
+    backgroundColor: colors.textPrimary,
+    borderColor: colors.textPrimary,
   },
-  filterButtonText: {
-    fontSize: fontSize.sm,
-    color: colors.textSecondary,
-    fontWeight: fontWeight.medium,
-  },
-  filterButtonTextActive: {
-    color: colors.background,
-    fontWeight: fontWeight.semibold,
-  },
-  exerciseCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.card,
-    borderRadius: radius.md,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  exerciseCardAdded: {
-    opacity: 0.5,
-    borderColor: colors.primary,
-  },
-  exerciseCardContent: {
-    flex: 1,
-  },
-  exerciseCardName: {
-    fontSize: fontSize.md,
-    fontWeight: fontWeight.semibold,
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-  },
-  exerciseCardMuscle: {
+  filterText: {
     fontSize: fontSize.sm,
     color: colors.textTertiary,
+    fontWeight: fontWeight.medium,
   },
-  addButton: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.sm,
-  },
-  addButtonText: {
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.semibold,
+  filterTextActive: {
     color: colors.background,
   },
-  addedBadge: {
-    backgroundColor: colors.elevated,
+  mainContent: {
+    flex: 1,
+    flexDirection: 'row',
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.sm,
+    gap: spacing.md,
   },
-  addedBadgeText: {
-    fontSize: fontSize.sm,
+  exerciseListContainer: {
+    flex: 1,
+  },
+  selectedContainer: {
+    flex: 1,
+  },
+  sectionTitle: {
+    fontSize: fontSize.xs,
     fontWeight: fontWeight.semibold,
+    color: colors.textDisabled,
+    letterSpacing: 1,
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.sm,
+  },
+  exerciseList: {
+    flex: 1,
+  },
+  exerciseItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.card,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  exerciseItemSelected: {
+    borderColor: colors.primary,
+    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+  },
+  exerciseCheckbox: {
+    width: 24,
+    height: 24,
+    borderRadius: radius.sm,
+    borderWidth: 2,
+    borderColor: colors.border,
+    marginRight: spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkmark: {
+    color: colors.primary,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.bold,
+  },
+  exerciseInfo: {
+    flex: 1,
+  },
+  exerciseName: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.medium,
+    color: colors.textPrimary,
+    marginBottom: 2,
+  },
+  exerciseNameSelected: {
     color: colors.primary,
   },
-  bottomBar: {
+  exerciseMuscle: {
+    fontSize: fontSize.xs,
+    color: colors.textDisabled,
+  },
+  selectedList: {
+    flex: 1,
+  },
+  selectedItem: {
+    backgroundColor: colors.card,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  selectedHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+  },
+  selectedNumber: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.bold,
+    color: colors.primary,
+    marginRight: spacing.sm,
+  },
+  selectedName: {
+    flex: 1,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.medium,
+    color: colors.textPrimary,
+  },
+  removeBtn: {
+    fontSize: fontSize.md,
+    color: colors.textDisabled,
+    padding: spacing.xs,
+  },
+  selectedControls: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  setsControl: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  setsBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: radius.sm,
+    backgroundColor: colors.elevated,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  setsBtnText: {
+    fontSize: fontSize.lg,
+    color: colors.textPrimary,
+    fontWeight: fontWeight.medium,
+  },
+  setsValue: {
+    fontSize: fontSize.sm,
+    color: colors.textTertiary,
+    marginHorizontal: spacing.md,
+    minWidth: 50,
+    textAlign: 'center',
+  },
+  orderControls: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  orderBtn: {
+    fontSize: fontSize.md,
+    color: colors.textTertiary,
+    padding: spacing.xs,
+  },
+  orderBtnDisabled: {
+    opacity: 0.3,
+  },
+  emptySelection: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.xxl,
+  },
+  emptyEmoji: {
+    fontSize: 32,
+    marginBottom: spacing.md,
+  },
+  emptyTitle: {
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.semibold,
+    color: colors.textTertiary,
+    marginBottom: spacing.xs,
+  },
+  emptySubtext: {
+    fontSize: fontSize.sm,
+    color: colors.textDisabled,
+    textAlign: 'center',
+  },
+  emptySearch: {
+    padding: spacing.xxl,
+    alignItems: 'center',
+  },
+  emptySearchText: {
+    fontSize: fontSize.sm,
+    color: colors.textDisabled,
+  },
+  footer: {
     padding: spacing.lg,
     paddingBottom: spacing.xxxl,
     backgroundColor: '#09090b',
     borderTopWidth: 1,
     borderTopColor: colors.elevated,
   },
-  startButton: {
-    width: '100%',
-  },
 });
+
+export default CustomWorkoutBuilder;
