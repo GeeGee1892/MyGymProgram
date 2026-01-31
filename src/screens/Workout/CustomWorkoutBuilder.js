@@ -143,14 +143,22 @@ export const CustomWorkoutBuilder = () => {
   
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
+      {/* Header with close button */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
+          <TouchableOpacity 
+            style={styles.closeButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.closeButtonText}>×</Text>
+          </TouchableOpacity>
           <Text style={styles.title}>Build Workout</Text>
-          {selectedExercises.length > 0 && (
+          {selectedExercises.length > 0 ? (
             <TouchableOpacity onPress={handleClear}>
               <Text style={styles.clearText}>Clear</Text>
             </TouchableOpacity>
+          ) : (
+            <View style={{ width: 50 }} />
           )}
         </View>
         <Text style={styles.subtitle}>
@@ -319,6 +327,17 @@ const styles = StyleSheet.create({
   clearText: {
     fontSize: fontSize.base,
     color: colors.danger,
+    width: 50,
+    textAlign: 'right',
+  },
+  closeButton: {
+    width: 50,
+    alignItems: 'flex-start',
+  },
+  closeButtonText: {
+    fontSize: 28,
+    color: colors.textTertiary,
+    lineHeight: 28,
   },
   subtitle: {
     fontSize: fontSize.sm,

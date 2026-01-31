@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   View, Text, TextInput, TouchableOpacity, StyleSheet, 
-  ScrollView, SafeAreaView, Alert, Modal 
+  ScrollView, SafeAreaView, Alert, Modal, Image, Platform
 } from 'react-native';
 import { useStore } from '../../store';
 import { Button, LastSessionBadge, EmptyState } from '../../components';
@@ -29,33 +29,36 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
   const [resting, setResting] = useState(false);
   const [restTime, setRestTime] = useState(60);
   
-  // FIXED: Exercise swap modal state
+  // Exercise swap modal state
   const [swapModalVisible, setSwapModalVisible] = useState(false);
   const [swapExerciseIndex, setSwapExerciseIndex] = useState(null);
   const [swapAlternatives, setSwapAlternatives] = useState([]);
+  
+  // End workout confirmation modal (for Expo compatibility)
+  const [endModalVisible, setEndModalVisible] = useState(false);
   
   // Get last session data for prefilling
   const [lastSessionData, setLastSessionData] = useState(null);
   const [suggestion, setSuggestion] = useState(null);
   
-  // FIXED: Use ref for timer to properly clean up
+  // Use ref for timer to properly clean up
   const timerRef = useRef(null);
   
   const totalSets = currentExercises.reduce((s, e) => s + e.sets, 0);
   const progress = totalSets > 0 ? (logged.length / totalSets) * 100 : 0;
   
-  // FIXED: Auto-save draft every 30 seconds - now includes local logged state
+  // Auto-save draft every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       if (logged.length > 0) {
-        saveDraftWorkout(logged); // FIXED: Pass logged state
+        saveDraftWorkout(logged);
       }
     }, 30000);
     
     return () => clearInterval(interval);
   }, [logged, saveDraftWorkout]);
   
-  // FIXED: Rest timer with proper cleanup
+  // Rest timer with proper cleanup
   useEffect(() => {
     if (resting && restTime > 0) {
       timerRef.current = setTimeout(() => setRestTime(r => r - 1), 1000);
@@ -64,7 +67,6 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
       setRestTime(60);
     }
     
-    // Cleanup on unmount or when dependencies change
     return () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
@@ -87,7 +89,6 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
     const done = completedSets[idx] || 0;
     if (done >= ex.sets) return;
     
-    // Get last session data for this exercise
     const lastData = getLastSession(ex.id);
     const progSuggestion = getProgressiveSuggestions(ex.id);
     
@@ -95,7 +96,6 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
     setActiveSet(done + 1);
     setReps('');
     
-    // Prefill weight from last session
     if (lastData && lastData.commonWeight) {
       setWeight(lastData.commonWeight.toString());
     } else {
@@ -106,6 +106,15 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
     setSuggestion(progSuggestion);
   };
   
+  // Cancel active exercise - FIXED
+  const handleCancelExercise = () => {
+    setActiveEx(null);
+    setLastSessionData(null);
+    setSuggestion(null);
+    setReps('');
+    setWeight('');
+  };
+  
   // Log a set
   const handleLog = () => {
     if (!reps || !weight || !activeEx) return;
@@ -113,7 +122,6 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
     const parsedReps = parseInt(reps, 10);
     const parsedWeight = parseFloat(weight);
     
-    // Validate inputs
     if (isNaN(parsedReps) || parsedReps <= 0) {
       Alert.alert('Invalid Reps', 'Please enter a valid number of reps.');
       return;
@@ -145,7 +153,6 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
     const totalDone = Object.values(newCompleted).reduce((a, b) => a + b, 0);
     
     if (totalDone >= totalSets) {
-      // All sets done - show completion confirmation
       Alert.alert(
         'Complete Workout?',
         `You've finished all ${totalSets} sets. Complete this workout?`,
@@ -153,11 +160,7 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
           { 
             text: 'Review First', 
             style: 'cancel',
-            onPress: () => {
-              setActiveEx(null);
-              setLastSessionData(null);
-              setSuggestion(null);
-            }
+            onPress: handleCancelExercise
           },
           { 
             text: 'Complete', 
@@ -169,14 +172,12 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
         ]
       );
     } else {
-      setActiveEx(null);
-      setLastSessionData(null);
-      setSuggestion(null);
+      handleCancelExercise();
       setResting(true);
     }
   };
   
-  // FIXED: End workout button now works properly
+  // End workout - FIXED for Expo
   const handleEndWorkout = () => {
     // Clean up timer first
     if (timerRef.current) {
@@ -184,49 +185,28 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
       timerRef.current = null;
     }
     setResting(false);
+    setEndModalVisible(true);
+  };
+  
+  const handleEndAction = (action) => {
+    setEndModalVisible(false);
     
-    if (logged.length > 0) {
-      Alert.alert(
-        'End Workout',
-        `You've completed ${logged.length} sets. What would you like to do?`,
-        [
-          { 
-            text: 'Continue Workout', 
-            style: 'cancel' 
-          },
-          {
-            text: 'Save as Draft',
-            onPress: () => {
-              saveDraftWorkout(logged);
-              navigation.goBack();
-            },
-          },
-          {
-            text: 'Complete & Save',
-            onPress: () => {
-              completeWorkout(logged);
-              navigation.replace('WorkoutComplete');
-            },
-          },
-        ]
-      );
-    } else {
-      Alert.alert(
-        'Discard Workout?',
-        'No sets logged. Are you sure you want to exit?',
-        [
-          { text: 'Continue', style: 'cancel' },
-          { 
-            text: 'Discard', 
-            style: 'destructive',
-            onPress: () => navigation.goBack() 
-          },
-        ]
-      );
+    if (action === 'continue') {
+      return;
+    }
+    
+    if (action === 'draft') {
+      saveDraftWorkout(logged);
+      navigation.goBack();
+    } else if (action === 'complete') {
+      completeWorkout(logged);
+      navigation.replace('WorkoutComplete');
+    } else if (action === 'discard') {
+      navigation.goBack();
     }
   };
   
-  // FIXED: Open swap modal for exercise
+  // Open swap modal for exercise
   const handleOpenSwap = (exerciseIndex) => {
     const exercise = currentExercises[exerciseIndex];
     if (!exercise) return;
@@ -246,7 +226,7 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
     setSwapModalVisible(true);
   };
   
-  // FIXED: Swap exercise
+  // Swap exercise
   const handleSwapExercise = (newExerciseId) => {
     if (swapExerciseIndex !== null) {
       swapExercise(swapExerciseIndex, newExerciseId);
@@ -263,7 +243,7 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
     return (
       <SafeAreaView style={styles.container}>
         <EmptyState
-          icon="💪"
+          icon="+"
           title="No exercises selected"
           message="Add some exercises to your workout to get started"
           actionLabel="Go Back"
@@ -272,6 +252,9 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
       </SafeAreaView>
     );
   }
+  
+  // Get current exercise data for image
+  const activeExData = activeEx ? exerciseDB[activeEx.id] : null;
   
   return (
     <SafeAreaView style={styles.container}>
@@ -291,20 +274,33 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
         <View style={styles.restScreen}>
           <Text style={styles.restLabel}>REST</Text>
           <Text style={styles.restTimer}>{fmtTime(restTime)}</Text>
-          <Button variant="ghost" size="sm" onPress={() => { setResting(false); setRestTime(60); }}>
-            Skip Rest
-          </Button>
+          <TouchableOpacity 
+            style={styles.skipButton}
+            onPress={() => { setResting(false); setRestTime(60); }}
+          >
+            <Text style={styles.skipButtonText}>Skip Rest</Text>
+          </TouchableOpacity>
           <Text style={styles.restHint}>Tap an exercise below to continue</Text>
         </View>
       ) : activeEx ? (
         <View style={styles.logScreen}>
+          {/* Exercise image */}
+          {activeExData?.media && (
+            <View style={styles.exerciseImageContainer}>
+              <Image 
+                source={activeExData.media} 
+                style={styles.exerciseImage}
+                resizeMode="contain"
+              />
+            </View>
+          )}
+          
           {/* Last session badge */}
           {lastSessionData && <LastSessionBadge lastSession={lastSessionData} />}
           
           {/* Progression suggestion */}
           {suggestion && (
             <View style={styles.suggestionBadge}>
-              <Text style={styles.suggestionIcon}>💡</Text>
               <View style={styles.suggestionContent}>
                 <Text style={styles.suggestionLabel}>SUGGESTED</Text>
                 <Text style={styles.suggestionText}>{suggestion.suggestion}</Text>
@@ -349,15 +345,22 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
             </View>
           </View>
           
-          <Button onPress={handleLog} disabled={!reps || !weight} style={styles.logButton}>
-            Log Set
-          </Button>
+          <TouchableOpacity 
+            style={[styles.logButton, (!reps || !weight) && styles.logButtonDisabled]}
+            onPress={handleLog} 
+            disabled={!reps || !weight}
+          >
+            <Text style={[styles.logButtonText, (!reps || !weight) && styles.logButtonTextDisabled]}>
+              Log Set
+            </Text>
+          </TouchableOpacity>
           
-          <TouchableOpacity onPress={() => {
-            setActiveEx(null);
-            setLastSessionData(null);
-            setSuggestion(null);
-          }}>
+          {/* Cancel button - FIXED */}
+          <TouchableOpacity 
+            style={styles.cancelButton}
+            onPress={handleCancelExercise}
+            hitSlop={{ top: 10, bottom: 10, left: 20, right: 20 }}
+          >
             <Text style={styles.cancelText}>Cancel</Text>
           </TouchableOpacity>
         </View>
@@ -381,6 +384,15 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
                 onPress={() => handleSelect(ex, i)}
                 disabled={complete}
               >
+                {/* Small thumbnail */}
+                {data.media && (
+                  <Image 
+                    source={data.media} 
+                    style={styles.exerciseThumbnail}
+                    resizeMode="cover"
+                  />
+                )}
+                
                 <View style={[styles.exerciseBadge, complete && styles.exerciseBadgeComplete]}>
                   <Text style={[styles.exerciseBadgeText, complete && styles.exerciseBadgeTextComplete]}>
                     {complete ? '✓' : i + 1}
@@ -395,13 +407,13 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
                 </View>
               </TouchableOpacity>
               
-              {/* FIXED: Swap button for each exercise */}
+              {/* Swap button with text - FIXED */}
               {!complete && (
                 <TouchableOpacity 
                   style={styles.swapButton}
                   onPress={() => handleOpenSwap(i)}
                 >
-                  <Text style={styles.swapButtonText}>↔</Text>
+                  <Text style={styles.swapButtonText}>Swap</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -409,14 +421,77 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
         })}
       </ScrollView>
       
-      {/* Bottom bar */}
+      {/* Bottom bar - End workout button */}
       <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.endButton} onPress={handleEndWorkout}>
+        <TouchableOpacity 
+          style={styles.endButton} 
+          onPress={handleEndWorkout}
+        >
           <Text style={styles.endText}>End Workout</Text>
         </TouchableOpacity>
       </View>
       
-      {/* FIXED: Exercise Swap Modal */}
+      {/* End Workout Modal - for Expo compatibility */}
+      <Modal
+        visible={endModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setEndModalVisible(false)}
+      >
+        <View style={styles.endModalOverlay}>
+          <View style={styles.endModalContent}>
+            <Text style={styles.endModalTitle}>
+              {logged.length > 0 ? 'End Workout' : 'Discard Workout?'}
+            </Text>
+            <Text style={styles.endModalMessage}>
+              {logged.length > 0 
+                ? `You've completed ${logged.length} sets. What would you like to do?`
+                : 'No sets logged. Are you sure you want to exit?'
+              }
+            </Text>
+            
+            {logged.length > 0 ? (
+              <>
+                <TouchableOpacity 
+                  style={styles.endModalButton}
+                  onPress={() => handleEndAction('complete')}
+                >
+                  <Text style={styles.endModalButtonText}>Complete & Save</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.endModalButton}
+                  onPress={() => handleEndAction('draft')}
+                >
+                  <Text style={styles.endModalButtonText}>Save as Draft</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.endModalButton, styles.endModalButtonCancel]}
+                  onPress={() => handleEndAction('continue')}
+                >
+                  <Text style={styles.endModalButtonTextCancel}>Continue Workout</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <TouchableOpacity 
+                  style={[styles.endModalButton, styles.endModalButtonDanger]}
+                  onPress={() => handleEndAction('discard')}
+                >
+                  <Text style={styles.endModalButtonText}>Discard</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.endModalButton, styles.endModalButtonCancel]}
+                  onPress={() => handleEndAction('continue')}
+                >
+                  <Text style={styles.endModalButtonTextCancel}>Continue</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
+      
+      {/* Exercise Swap Modal */}
       <Modal
         visible={swapModalVisible}
         animationType="slide"
@@ -427,7 +502,7 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Swap Exercise</Text>
             <TouchableOpacity onPress={() => setSwapModalVisible(false)}>
-              <Text style={styles.modalClose}>✕</Text>
+              <Text style={styles.modalClose}>×</Text>
             </TouchableOpacity>
           </View>
           
@@ -449,6 +524,13 @@ export const ActiveWorkoutScreen = ({ navigation, route }) => {
                   style={styles.alternativeItem}
                   onPress={() => handleSwapExercise(altId)}
                 >
+                  {altData.media && (
+                    <Image 
+                      source={altData.media} 
+                      style={styles.alternativeThumbnail}
+                      resizeMode="cover"
+                    />
+                  )}
                   <View style={styles.alternativeInfo}>
                     <Text style={styles.alternativeName}>{altData.name}</Text>
                     <Text style={styles.alternativeMuscle}>{altData.muscles}</Text>
@@ -520,6 +602,15 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
     marginBottom: spacing.xxl,
   },
+  skipButton: {
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+  },
+  skipButtonText: {
+    color: colors.textTertiary,
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.medium,
+  },
   restHint: {
     fontSize: fontSize.sm,
     color: colors.textDisabled,
@@ -531,6 +622,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: spacing.xxl,
   },
+  exerciseImageContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: radius.lg,
+    backgroundColor: colors.card,
+    marginBottom: spacing.lg,
+    overflow: 'hidden',
+  },
+  exerciseImage: {
+    width: '100%',
+    height: '100%',
+  },
   suggestionBadge: {
     flexDirection: 'row',
     backgroundColor: 'rgba(16, 185, 129, 0.08)',
@@ -540,10 +643,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(16, 185, 129, 0.2)',
     alignSelf: 'stretch',
-  },
-  suggestionIcon: {
-    fontSize: 24,
-    marginRight: spacing.md,
   },
   suggestionContent: {
     flex: 1,
@@ -617,11 +716,29 @@ const styles = StyleSheet.create({
   logButton: {
     width: '100%',
     maxWidth: 280,
+    backgroundColor: '#fff',
+    borderRadius: radius.md,
+    paddingVertical: spacing.lg,
+    alignItems: 'center',
+  },
+  logButtonDisabled: {
+    backgroundColor: colors.elevated,
+  },
+  logButtonText: {
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.semibold,
+    color: '#000',
+  },
+  logButtonTextDisabled: {
+    color: colors.textDisabled,
+  },
+  cancelButton: {
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.xxl,
   },
   cancelText: {
     color: colors.textDisabled,
     fontSize: fontSize.base,
-    marginTop: spacing.lg,
   },
   emptyLog: {
     flex: 1,
@@ -653,6 +770,12 @@ const styles = StyleSheet.create({
   },
   exerciseItemComplete: {
     opacity: 0.4,
+  },
+  exerciseThumbnail: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.sm,
+    backgroundColor: colors.elevated,
   },
   exerciseBadge: {
     width: 28,
@@ -690,23 +813,22 @@ const styles = StyleSheet.create({
     color: colors.textDisabled,
     fontSize: fontSize.sm,
   },
-  // FIXED: Swap button styles
+  // Swap button with text
   swapButton: {
-    width: 36,
-    height: 36,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
     borderRadius: radius.sm,
     backgroundColor: colors.elevated,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginLeft: spacing.sm,
   },
   swapButtonText: {
     color: colors.textTertiary,
-    fontSize: fontSize.md,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.medium,
   },
   bottomBar: {
     padding: spacing.lg,
-    paddingBottom: spacing.xxxl,
+    paddingBottom: Platform.OS === 'ios' ? spacing.xxxl : spacing.lg,
     backgroundColor: '#09090b',
     borderTopWidth: 1,
     borderTopColor: colors.elevated,
@@ -721,7 +843,60 @@ const styles = StyleSheet.create({
     fontSize: fontSize.base,
     fontWeight: fontWeight.medium,
   },
-  // Modal styles
+  // End Modal styles
+  endModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.xxl,
+  },
+  endModalContent: {
+    backgroundColor: colors.card,
+    borderRadius: radius.lg,
+    padding: spacing.xxl,
+    width: '100%',
+    maxWidth: 320,
+  },
+  endModalTitle: {
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
+    textAlign: 'center',
+    marginBottom: spacing.sm,
+  },
+  endModalMessage: {
+    fontSize: fontSize.base,
+    color: colors.textTertiary,
+    textAlign: 'center',
+    marginBottom: spacing.xl,
+  },
+  endModalButton: {
+    backgroundColor: colors.primary,
+    borderRadius: radius.md,
+    paddingVertical: spacing.md,
+    marginBottom: spacing.sm,
+    alignItems: 'center',
+  },
+  endModalButtonCancel: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  endModalButtonDanger: {
+    backgroundColor: colors.danger,
+  },
+  endModalButtonText: {
+    color: '#fff',
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.semibold,
+  },
+  endModalButtonTextCancel: {
+    color: colors.textTertiary,
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.medium,
+  },
+  // Swap Modal styles
   modalContainer: {
     flex: 1,
     backgroundColor: colors.background,
@@ -741,9 +916,10 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   modalClose: {
-    fontSize: fontSize.xxl,
+    fontSize: 28,
     color: colors.textTertiary,
     padding: spacing.sm,
+    lineHeight: 28,
   },
   modalSubtitle: {
     fontSize: fontSize.md,
@@ -762,13 +938,19 @@ const styles = StyleSheet.create({
   alternativeItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     backgroundColor: colors.card,
     borderRadius: radius.md,
     padding: spacing.lg,
     marginBottom: spacing.md,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  alternativeThumbnail: {
+    width: 48,
+    height: 48,
+    borderRadius: radius.sm,
+    backgroundColor: colors.elevated,
+    marginRight: spacing.md,
   },
   alternativeInfo: {
     flex: 1,
