@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -27,18 +27,17 @@ import { CustomWorkoutBuilder } from './src/screens/Workout/CustomWorkoutBuilder
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Tab icon component
+// Minimal tab icon component - no emojis, just text
 const TabIcon = ({ label, focused }) => {
-  const icons = { Home: '🏠', Analytics: '📊', Builder: '⚙️' };
   return (
     <View style={styles.tabIcon}>
-      <Text style={styles.tabEmoji}>{icons[label]}</Text>
+      <View style={[styles.tabDot, focused && styles.tabDotActive]} />
       <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>{label}</Text>
     </View>
   );
 };
 
-// Main tabs navigator
+// Main tabs navigator - only 2 tabs now
 function MainTabs() {
   return (
     <Tab.Navigator
@@ -58,11 +57,6 @@ function MainTabs() {
         component={AnalyticsScreen}
         options={{ tabBarIcon: ({ focused }) => <TabIcon label="Analytics" focused={focused} /> }}
       />
-      <Tab.Screen 
-        name="BuilderTab" 
-        component={CustomWorkoutBuilder}
-        options={{ tabBarIcon: ({ focused }) => <TabIcon label="Builder" focused={focused} /> }}
-      />
     </Tab.Navigator>
   );
 }
@@ -70,8 +64,8 @@ function MainTabs() {
 // Splash/Loading screen shown during hydration
 const SplashScreen = () => (
   <View style={styles.splashContainer}>
-    <Text style={styles.splashLogo}>💪</Text>
     <Text style={styles.splashTitle}>MyGymProgram</Text>
+    <Text style={styles.splashSlogan}>Every rep counts.</Text>
     <ActivityIndicator color="#10b981" style={styles.splashLoader} />
   </View>
 );
@@ -81,7 +75,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // FIXED: Wait for loadData to complete before rendering navigation
+  // Wait for loadData to complete before rendering navigation
   useEffect(() => {
     const hydrate = async () => {
       try {
@@ -117,7 +111,6 @@ export default function App() {
             contentStyle: { backgroundColor: '#000' },
             animation: 'slide_from_right',
           }}
-          // FIXED: Now evaluates AFTER hydration is complete
           initialRouteName={isOnboarded ? 'Main' : 'Welcome'}
         >
           {/* Onboarding Flow */}
@@ -130,15 +123,23 @@ export default function App() {
 
           {/* Main App */}
           <Stack.Screen name="Main" component={MainTabs} />
-          {/* FIXED: Removed duplicate "Home" route */}
           
           {/* Workout Screens */}
           <Stack.Screen name="ActiveWorkout" component={ActiveWorkoutScreen} />
-          {/* FIXED: Added missing WorkoutComplete screen */}
           <Stack.Screen 
             name="WorkoutComplete" 
             component={WorkoutCompleteScreen}
-            options={{ gestureEnabled: false }} // Prevent swipe back
+            options={{ gestureEnabled: false }}
+          />
+          
+          {/* Custom Workout - now a stack screen, not a tab */}
+          <Stack.Screen 
+            name="CustomWorkout" 
+            component={CustomWorkoutBuilder}
+            options={{
+              animation: 'slide_from_bottom',
+              presentation: 'modal',
+            }}
           />
         </Stack.Navigator>
       </NavigationContainer>
@@ -151,20 +152,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#18181b',
     borderTopColor: '#27272a',
     borderTopWidth: 1,
-    height: 80,
+    height: Platform.OS === 'ios' ? 84 : 64,
     paddingTop: 8,
-    paddingBottom: 20,
+    paddingBottom: Platform.OS === 'ios' ? 28 : 8,
   },
   tabIcon: {
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 6,
   },
-  tabEmoji: {
-    fontSize: 24,
-    marginBottom: 4,
+  tabDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'transparent',
+  },
+  tabDotActive: {
+    backgroundColor: '#10b981',
   },
   tabLabel: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#71717a',
     fontWeight: '500',
   },
@@ -178,15 +185,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  splashLogo: {
-    fontSize: 64,
-    marginBottom: 16,
-  },
   splashTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '700',
     color: '#fff',
-    marginBottom: 24,
+    marginBottom: 4,
+  },
+  splashSlogan: {
+    fontSize: 16,
+    color: '#10b981',
+    fontWeight: '500',
+    marginBottom: 32,
   },
   splashLoader: {
     marginTop: 16,
