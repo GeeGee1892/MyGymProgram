@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -21,12 +21,13 @@ import {
 import { HomeScreen } from './src/screens/Home/HomeScreen';
 import { AnalyticsScreen } from './src/screens/Home/AnalyticsScreen';
 import { ActiveWorkoutScreen } from './src/screens/Workout/ActiveWorkoutScreen';
+import { WorkoutCompleteScreen } from './src/screens/Workout/WorkoutCompleteScreen';
 import { CustomWorkoutBuilder } from './src/screens/Workout/CustomWorkoutBuilder';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Tab icon
+// Tab icon component
 const TabIcon = ({ label, focused }) => {
   const icons = { Home: '🏠', Analytics: '📊', Builder: '⚙️' };
   return (
@@ -37,7 +38,7 @@ const TabIcon = ({ label, focused }) => {
   );
 };
 
-// Main tabs
+// Main tabs navigator
 function MainTabs() {
   return (
     <Tab.Navigator
@@ -66,12 +67,45 @@ function MainTabs() {
   );
 }
 
+// Splash/Loading screen shown during hydration
+const SplashScreen = () => (
+  <View style={styles.splashContainer}>
+    <Text style={styles.splashLogo}>💪</Text>
+    <Text style={styles.splashTitle}>MyGymProgram</Text>
+    <ActivityIndicator color="#10b981" style={styles.splashLoader} />
+  </View>
+);
+
 export default function App() {
   const { loadData, isOnboarded } = useStore();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isHydrated, setIsHydrated] = useState(false);
 
+  // FIXED: Wait for loadData to complete before rendering navigation
   useEffect(() => {
-    loadData();
+    const hydrate = async () => {
+      try {
+        await loadData();
+      } catch (error) {
+        console.error('Failed to load data:', error);
+      } finally {
+        setIsHydrated(true);
+        // Small delay for smooth transition
+        setTimeout(() => setIsLoading(false), 300);
+      }
+    };
+    hydrate();
   }, []);
+
+  // Show splash screen while loading
+  if (isLoading || !isHydrated) {
+    return (
+      <SafeAreaProvider>
+        <StatusBar style="light" />
+        <SplashScreen />
+      </SafeAreaProvider>
+    );
+  }
 
   return (
     <SafeAreaProvider>
@@ -83,9 +117,10 @@ export default function App() {
             contentStyle: { backgroundColor: '#000' },
             animation: 'slide_from_right',
           }}
+          // FIXED: Now evaluates AFTER hydration is complete
           initialRouteName={isOnboarded ? 'Main' : 'Welcome'}
         >
-          {/* Onboarding */}
+          {/* Onboarding Flow */}
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
           <Stack.Screen name="OnboardingName" component={NameScreen} />
           <Stack.Screen name="OnboardingStats" component={StatsScreen} />
@@ -93,12 +128,18 @@ export default function App() {
           <Stack.Screen name="OnboardingTrainingDays" component={TrainingDaysScreen} />
           <Stack.Screen name="OnboardingPlanReady" component={PlanReadyScreen} />
 
-          {/* Main App with Tabs */}
+          {/* Main App */}
           <Stack.Screen name="Main" component={MainTabs} />
-          <Stack.Screen name="Home" component={MainTabs} />
+          {/* FIXED: Removed duplicate "Home" route */}
           
-          {/* Workout screens */}
+          {/* Workout Screens */}
           <Stack.Screen name="ActiveWorkout" component={ActiveWorkoutScreen} />
+          {/* FIXED: Added missing WorkoutComplete screen */}
+          <Stack.Screen 
+            name="WorkoutComplete" 
+            component={WorkoutCompleteScreen}
+            options={{ gestureEnabled: false }} // Prevent swipe back
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
@@ -129,5 +170,25 @@ const styles = StyleSheet.create({
   },
   tabLabelActive: {
     color: '#fff',
+  },
+  // Splash screen styles
+  splashContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  splashLogo: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  splashTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 24,
+  },
+  splashLoader: {
+    marginTop: 16,
   },
 });
