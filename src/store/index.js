@@ -1,421 +1,552 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { workoutTemplates } from '../data/workoutTemplates';
-import { calcCalories, calcProtein, calcVolume, calcWeeklyCalorieAdjustment, calcProgressiveSuggestion } from '../utils/calculations';
+// FIXED: Import alternatives - this was missing and caused crashes
+import { alternatives, getAlternatives } from '../data/alternatives';
+import { calcProgressiveSuggestion } from '../utils/calculations';
 
-const STORAGE_KEY = '@MyGymProgram:store';
+const STORAGE_KEY = '@MyGymProgram:data';
+const SCHEMA_VERSION = 1;
 
-export const useStore = create((set, get) => ({
-  // ==================== USER DATA ====================
+// Default state shape for validation
+const defaultState = {
+  // User profile
   userData: {
     name: '',
-    weight: 0,
-    height: 0,
-    age: 0,
-    gender: 'male',
-    goal: 'cut',
-    activityLevel: 'moderate',
-    trainingDaysPerWeek: 4,
-    targetWeight: 82,
-    calories: 0,
-    protein: 0,
+    gender: null,
+    age: null,
+    height: null,
+    weight: null,
+    targetWeight: null,
+    goal: null,
+    trainingDaysPerWeek: null,
+    calories: null,
+    protein: null,
   },
+  
+  // App state
   isOnboarded: false,
   
-  setUserData: (data) => set((state) => {
-    const updated = { ...state.userData, ...data };
-    // Auto-calculate calories and protein if weight/goal changes
-    if (data.weight || data.goal || data.activityLevel) {
-      const bmr = 10 * updated.weight + 6.25 * updated.height - 5 * updated.age + (updated.gender === 'male' ? 5 : -161);
-      updated.calories = calcCalories(bmr, updated.activityLevel, updated.goal);
-      updated.protein = calcProtein(updated.weight, updated.goal);
-    }
-    return { userData: updated };
-  }),
-  
-  completeOnboarding: () => set({ isOnboarded: true }),
-  
-  // ==================== WORKOUT STATE ====================
+  // Workout state
   currentWorkoutType: null,
   currentExercises: [],
   currentSets: [],
-  draftWorkout: null, // Save incomplete workouts
   
-  startWorkout: (type, customExercises = null) => {
-    // Custom workout with user-provided exercises
-    if (type === 'Custom' && customExercises) {
-      set({ 
-        currentWorkoutType: 'Custom', 
-        currentExercises: customExercises,
-        currentSets: [],
-        draftWorkout: null,
-      });
+  // History
+  workoutHistory: [],
+  dailyCheckIns: [],
+  weightHistory: [],
+  
+  // Progress tracking
+  prs: {},
+  lastWorkoutPRs: [],
+  streak: 0,
+  lastWorkoutDate: null,
+  
+  // Draft state
+  draftWorkout: null,
+  
+  // Schema version for migrations
+  schemaVersion: SCHEMA_VERSION,
+};
+
+// FIXED: Schema validation function
+const validateAndMigrateState = (loadedState) => {
+  if (!loadedState || typeof loadedState !== 'object') {
+    console.warn('Invalid state loaded, using defaults');
+    return { ...defaultState };
+  }
+  
+  // Merge with defaults to ensure all fields exist
+  const state = {
+    ...defaultState,
+    ...loadedState,
+    userData: {
+      ...defaultState.userData,
+      ...(loadedState.userData || {}),
+    },
+  };
+  
+  // Ensure arrays are arrays
+  if (!Array.isArray(state.workoutHistory)) state.workoutHistory = [];
+  if (!Array.isArray(state.dailyCheckIns)) state.dailyCheckIns = [];
+  if (!Array.isArray(state.weightHistory)) state.weightHistory = [];
+  if (!Array.isArray(state.currentExercises)) state.currentExercises = [];
+  if (!Array.isArray(state.currentSets)) state.currentSets = [];
+  if (!Array.isArray(state.lastWorkoutPRs)) state.lastWorkoutPRs = [];
+  
+  // Ensure objects are objects
+  if (typeof state.prs !== 'object' || state.prs === null) state.prs = {};
+  
+  // Handle schema migrations
+  if (state.schemaVersion !== SCHEMA_VERSION) {
+    console.log(`Migrating schema from v${state.schemaVersion} to v${SCHEMA_VERSION}`);
+    state.schemaVersion = SCHEMA_VERSION;
+  }
+  
+  return state;
+};
+
+// FIXED: Safe number parsing with NaN guards
+const safeParseFloat = (value, fallback = 0) => {
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? fallback : parsed;
+};
+
+const safeParseInt = (value, fallback = 0) => {
+  const parsed = parseInt(value, 10);
+  return isNaN(parsed) ? fallback : parsed;
+};
+
+// FIXED: Debounced save to prevent race conditions
+let saveTimeout = null;
+const SAVE_DEBOUNCE_MS = 1000;
+
+const debouncedSave = async (state) => {
+  if (saveTimeout) {
+    clearTimeout(saveTimeout);
+  }
+  
+  saveTimeout = setTimeout(async () => {
+    try {
+      const stateToSave = {
+        userData: state.userData,
+        isOnboarded: state.isOnboarded,
+        workoutHistory: state.workoutHistory,
+        dailyCheckIns: state.dailyCheckIns,
+        weightHistory: state.weightHistory,
+        prs: state.prs,
+        streak: state.streak,
+        lastWorkoutDate: state.lastWorkoutDate,
+        draftWorkout: state.draftWorkout,
+        schemaVersion: SCHEMA_VERSION,
+      };
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+    } catch (error) {
+      console.error('Failed to save data:', error);
+      // TODO: Could emit an event here for UI to show error toast
+    }
+  }, SAVE_DEBOUNCE_MS);
+};
+
+// FIXED: Streak calculation
+const calculateStreak = (workoutHistory, lastDate) => {
+  if (!workoutHistory || workoutHistory.length === 0) return 0;
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  // Sort workouts by date descending
+  const sortedWorkouts = [...workoutHistory].sort(
+    (a, b) => new Date(b.date) - new Date(a.date)
+  );
+  
+  let streak = 0;
+  let checkDate = new Date(today);
+  
+  for (const workout of sortedWorkouts) {
+    const workoutDate = new Date(workout.date);
+    workoutDate.setHours(0, 0, 0, 0);
+    
+    const diffDays = Math.floor((checkDate - workoutDate) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays <= 1) {
+      streak++;
+      checkDate = workoutDate;
+    } else if (diffDays > 1) {
+      break;
+    }
+  }
+  
+  return streak;
+};
+
+export const useStore = create((set, get) => ({
+  ...defaultState,
+  
+  // ============================================
+  // DATA PERSISTENCE
+  // ============================================
+  
+  loadData: async () => {
+    try {
+      const stored = await AsyncStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const validated = validateAndMigrateState(parsed);
+        
+        // Recalculate streak on load
+        const streak = calculateStreak(validated.workoutHistory, validated.lastWorkoutDate);
+        
+        set({ ...validated, streak });
+        return true;
+      }
+    } catch (error) {
+      console.error('Failed to load data:', error);
+    }
+    return false;
+  },
+  
+  saveData: async () => {
+    const state = get();
+    debouncedSave(state);
+  },
+  
+  // ============================================
+  // USER DATA
+  // ============================================
+  
+  setUserData: (updates) => {
+    set((state) => {
+      const newState = {
+        userData: { ...state.userData, ...updates },
+      };
+      debouncedSave({ ...state, ...newState });
+      return newState;
+    });
+  },
+  
+  completeOnboarding: () => {
+    set((state) => {
+      const newState = { isOnboarded: true };
+      // Force immediate save for onboarding completion
+      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({
+        ...state,
+        ...newState,
+        schemaVersion: SCHEMA_VERSION,
+      })).catch(console.error);
+      return newState;
+    });
+  },
+  
+  // ============================================
+  // WEIGHT TRACKING
+  // ============================================
+  
+  updateWeight: (weight) => {
+    const parsedWeight = safeParseFloat(weight);
+    if (parsedWeight <= 0 || parsedWeight > 500) {
+      console.warn('Invalid weight value:', weight);
       return;
     }
     
-    // Template-based workout (PPL)
-    const template = workoutTemplates[type] || [];
-    const exercises = template.map((ex) => ({ ...ex }));
-    set({ 
-      currentWorkoutType: type, 
-      currentExercises: exercises,
-      currentSets: [],
-      draftWorkout: null, // Clear any existing draft
+    set((state) => {
+      // Update user data weight
+      const newUserData = { ...state.userData, weight: parsedWeight };
+      
+      // FIXED: Don't add to weightHistory here - only addDailyCheckIn does this
+      // This prevents duplicate entries
+      
+      const newState = { userData: newUserData };
+      debouncedSave({ ...state, ...newState });
+      return newState;
     });
   },
   
-  swapExercise: (index, newExerciseId) => set((state) => {
-    const exercises = [...state.currentExercises];
-    const oldExercise = exercises[index];
-    
-    // Keep the same sets/reps, just change the exercise ID
-    exercises[index] = { 
-      ...oldExercise,
-      id: newExerciseId,
-      // Preserve sets and reps from original
-      sets: oldExercise.sets,
-      reps: oldExercise.reps,
-    };
-    
-    return { currentExercises: exercises };
-  }),
+  // ============================================
+  // DAILY CHECK-INS
+  // ============================================
   
-  // Get all available alternatives for any exercise (works for swapped exercises too)
-  getExerciseAlternatives: (exerciseId) => {
-    // Direct alternatives from mapping
-    const directAlts = alternatives[exerciseId] || [];
+  addDailyCheckIn: (data) => {
+    const weight = safeParseFloat(data.weight);
+    if (weight <= 0 || weight > 500) {
+      console.warn('Invalid check-in weight:', data.weight);
+      return;
+    }
     
-    // Reverse lookup - find any exercise that lists this as an alternative
-    const reverseAlts = Object.keys(alternatives).filter(
-      (key) => alternatives[key].includes(exerciseId)
-    );
-    
-    // Also get siblings (alternatives of the reverse alternatives)
-    const siblings = [];
-    reverseAlts.forEach((parentId) => {
-      alternatives[parentId].forEach((siblingId) => {
-        if (siblingId !== exerciseId && !siblings.includes(siblingId)) {
-          siblings.push(siblingId);
+    set((state) => {
+      const today = new Date().toISOString();
+      const checkIn = {
+        date: today,
+        weight,
+        hitProtein: Boolean(data.hitProtein),
+        calories: data.calories ? safeParseInt(data.calories) : null,
+      };
+      
+      // Update weight history (single source of truth for weight tracking)
+      const weightEntry = {
+        date: today,
+        weight,
+      };
+      
+      // Check if we already have an entry for today
+      const todayDate = new Date().toDateString();
+      const existingIndex = state.weightHistory.findIndex(
+        (w) => new Date(w.date).toDateString() === todayDate
+      );
+      
+      let newWeightHistory;
+      if (existingIndex >= 0) {
+        // Update existing entry
+        newWeightHistory = [...state.weightHistory];
+        newWeightHistory[existingIndex] = weightEntry;
+      } else {
+        // Add new entry
+        newWeightHistory = [...state.weightHistory, weightEntry];
+      }
+      
+      // Also check for duplicate daily check-in
+      const existingCheckInIndex = state.dailyCheckIns.findIndex(
+        (c) => new Date(c.date).toDateString() === todayDate
+      );
+      
+      let newDailyCheckIns;
+      if (existingCheckInIndex >= 0) {
+        newDailyCheckIns = [...state.dailyCheckIns];
+        newDailyCheckIns[existingCheckInIndex] = checkIn;
+      } else {
+        newDailyCheckIns = [...state.dailyCheckIns, checkIn];
+      }
+      
+      // Update user's current weight
+      const newUserData = { ...state.userData, weight };
+      
+      const newState = {
+        dailyCheckIns: newDailyCheckIns,
+        weightHistory: newWeightHistory,
+        userData: newUserData,
+      };
+      
+      debouncedSave({ ...state, ...newState });
+      return newState;
+    });
+  },
+  
+  // ============================================
+  // WORKOUTS
+  // ============================================
+  
+  startWorkout: (type, customExercises = null) => {
+    set((state) => {
+      const exercises = customExercises || workoutTemplates[type] || [];
+      const newState = {
+        currentWorkoutType: type,
+        currentExercises: exercises,
+        currentSets: [],
+      };
+      return newState;
+    });
+  },
+  
+  completeWorkout: (loggedSets) => {
+    set((state) => {
+      const date = new Date().toISOString();
+      
+      // Check for PRs
+      const newPRs = { ...state.prs };
+      const sessionPRs = [];
+      
+      // Group sets by exercise
+      const setsByExercise = {};
+      loggedSets.forEach((set) => {
+        const key = set.exerciseId || set.exercise;
+        if (!setsByExercise[key]) setsByExercise[key] = [];
+        setsByExercise[key].push(set);
+      });
+      
+      // Check each exercise for PR
+      Object.entries(setsByExercise).forEach(([exerciseId, sets]) => {
+        const maxWeight = Math.max(...sets.map((s) => safeParseFloat(s.weight)));
+        const currentPR = newPRs[exerciseId];
+        const currentPRWeight = typeof currentPR === 'object' ? currentPR.weight : currentPR;
+        
+        if (!currentPRWeight || maxWeight > currentPRWeight) {
+          newPRs[exerciseId] = {
+            weight: maxWeight,
+            date,
+            reps: sets.find((s) => safeParseFloat(s.weight) === maxWeight)?.reps || 0,
+          };
+          sessionPRs.push({ exerciseId, weight: maxWeight });
         }
       });
+      
+      const workout = {
+        id: Date.now().toString(),
+        date,
+        type: state.currentWorkoutType,
+        sets: loggedSets,
+        duration: null, // Could calculate from first to last set timestamp
+      };
+      
+      const newWorkoutHistory = [...state.workoutHistory, workout];
+      const newStreak = calculateStreak(newWorkoutHistory, date);
+      
+      const newState = {
+        workoutHistory: newWorkoutHistory,
+        currentWorkoutType: null,
+        currentExercises: [],
+        currentSets: [],
+        prs: newPRs,
+        lastWorkoutPRs: sessionPRs,
+        lastWorkoutDate: date,
+        streak: newStreak,
+        draftWorkout: null, // Clear any draft
+      };
+      
+      debouncedSave({ ...state, ...newState });
+      return newState;
     });
-    
-    // Combine all and deduplicate
-    const allAlts = [...new Set([...directAlts, ...reverseAlts, ...siblings])];
-    
-    // Remove the current exercise itself
-    return allAlts.filter((id) => id !== exerciseId);
   },
   
-  addExercise: (exercise) => set((state) => ({
-    currentExercises: [...state.currentExercises, exercise],
-  })),
+  saveDraftWorkout: (localSets = []) => {
+    set((state) => {
+      const draft = {
+        type: state.currentWorkoutType,
+        exercises: state.currentExercises,
+        sets: [...state.currentSets, ...localSets], // FIXED: Include local state
+        savedAt: new Date().toISOString(),
+      };
+      
+      const newState = { draftWorkout: draft };
+      debouncedSave({ ...state, ...newState });
+      return newState;
+    });
+  },
   
-  removeExercise: (index) => set((state) => ({
-    currentExercises: state.currentExercises.filter((_, i) => i !== index),
-  })),
+  loadDraftWorkout: () => {
+    const state = get();
+    if (state.draftWorkout) {
+      set({
+        currentWorkoutType: state.draftWorkout.type,
+        currentExercises: state.draftWorkout.exercises,
+        currentSets: state.draftWorkout.sets,
+      });
+      return true;
+    }
+    return false;
+  },
   
-  updateExercise: (index, updates) => set((state) => {
-    const exercises = [...state.currentExercises];
-    exercises[index] = { ...exercises[index], ...updates };
-    return { currentExercises: exercises };
-  }),
+  clearDraftWorkout: () => {
+    set((state) => {
+      const newState = { draftWorkout: null };
+      debouncedSave({ ...state, ...newState });
+      return newState;
+    });
+  },
   
-  saveDraftWorkout: () => set((state) => ({
-    draftWorkout: {
-      type: state.currentWorkoutType,
-      exercises: state.currentExercises,
-      sets: state.currentSets,
-      savedAt: new Date().toISOString(),
-    },
-  })),
+  // ============================================
+  // EXERCISE ALTERNATIVES
+  // ============================================
   
-  loadDraftWorkout: () => set((state) => {
-    if (!state.draftWorkout) return {};
-    return {
-      currentWorkoutType: state.draftWorkout.type,
-      currentExercises: state.draftWorkout.exercises,
-      currentSets: state.draftWorkout.sets,
-    };
-  }),
+  // FIXED: Now properly imports and uses alternatives
+  getExerciseAlternatives: (exerciseId) => {
+    return getAlternatives(exerciseId);
+  },
   
-  clearDraftWorkout: () => set({ draftWorkout: null }),
-  
-  completeWorkout: (sets) => set((state) => {
-    const workout = {
-      type: state.currentWorkoutType,
-      date: new Date().toISOString(),
-      sets,
-      volume: calcVolume(sets),
-    };
-    
-    // Check for new PRs
-    const newPRs = {};
-    sets.forEach((s) => {
-      const key = s.exerciseId;
-      const weight = parseFloat(s.weight);
-      const currentPR = state.prs[key] || 0;
-      if (weight > currentPR) {
-        newPRs[key] = {
-          weight,
-          date: workout.date,
-          reps: s.reps,
+  swapExercise: (index, newExerciseId) => {
+    set((state) => {
+      const newExercises = [...state.currentExercises];
+      if (index >= 0 && index < newExercises.length) {
+        newExercises[index] = {
+          ...newExercises[index],
+          id: newExerciseId,
         };
       }
+      return { currentExercises: newExercises };
     });
-    
-    return {
-      workoutHistory: [...state.workoutHistory, workout],
-      currentSets: sets,
-      currentWorkoutType: null,
-      currentExercises: [],
-      prs: { ...state.prs, ...newPRs },
-      draftWorkout: null,
-      lastWorkoutPRs: Object.keys(newPRs).length > 0 ? newPRs : null,
-    };
-  }),
-  
-  // ==================== HISTORY & TRACKING ====================
-  workoutHistory: [],
-  weightHistory: [],
-  dailyCheckIns: [], // { date, weight, sleep, hitProtein }
-  prs: {}, // { exerciseId: { weight, date, reps } }
-  lastWorkoutPRs: null, // PRs from last completed workout
-  streak: 0,
-  
-  updateWeight: (weight, date) => set((state) => {
-    const entry = { 
-      weight: parseFloat(weight), 
-      date: date || new Date().toISOString() 
-    };
-    return {
-      weightHistory: [...state.weightHistory, entry],
-      userData: { ...state.userData, weight: parseFloat(weight) },
-    };
-  }),
-  
-  addDailyCheckIn: (data) => set((state) => {
-    const checkIn = {
-      date: new Date().toISOString(),
-      weight: data.weight,
-      sleep: data.sleep, // 1-10 rating
-      hitProtein: data.hitProtein, // boolean
-      calories: data.calories || null, // daily calorie intake
-    };
-    
-    // Also update weight history
-    const newWeightHistory = [...state.weightHistory, { 
-      weight: data.weight, 
-      date: checkIn.date 
-    }];
-    
-    // Update user's current weight
-    const newUserData = { ...state.userData, weight: data.weight };
-    
-    return {
-      dailyCheckIns: [...state.dailyCheckIns, checkIn],
-      weightHistory: newWeightHistory,
-      userData: newUserData,
-    };
-  }),
-  
-  // ==================== WEEKLY REVIEW ====================
-  weeklyReviews: [], // { date, weightChange, workoutsCompleted, avgVolume, calorieAdjustment }
-  lastReviewDate: null,
-  
-  generateWeeklyReview: () => set((state) => {
-    const now = new Date();
-    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    
-    // Get this week's data
-    const thisWeekWorkouts = state.workoutHistory.filter(
-      (w) => new Date(w.date) >= oneWeekAgo
-    );
-    const thisWeekCheckIns = state.dailyCheckIns.filter(
-      (c) => new Date(c.date) >= oneWeekAgo
-    );
-    
-    // Calculate weight change
-    const startWeight = thisWeekCheckIns[0]?.weight || state.userData.weight;
-    const endWeight = thisWeekCheckIns[thisWeekCheckIns.length - 1]?.weight || state.userData.weight;
-    const weightChange = endWeight - startWeight;
-    
-    // Calculate average volume
-    const totalVolume = thisWeekWorkouts.reduce((sum, w) => sum + w.volume, 0);
-    const avgVolume = thisWeekWorkouts.length > 0 ? totalVolume / thisWeekWorkouts.length : 0;
-    
-    // Calculate calorie adjustment
-    const calorieAdj = calcWeeklyCalorieAdjustment(weightChange, state.userData.calories);
-    
-    // Count protein hits
-    const proteinHits = thisWeekCheckIns.filter((c) => c.hitProtein).length;
-    
-    // Sleep average
-    const avgSleep = thisWeekCheckIns.length > 0
-      ? thisWeekCheckIns.reduce((sum, c) => sum + c.sleep, 0) / thisWeekCheckIns.length
-      : 0;
-    
-    const review = {
-      date: now.toISOString(),
-      weekStart: oneWeekAgo.toISOString(),
-      workoutsCompleted: thisWeekWorkouts.length,
-      weightChange,
-      avgVolume,
-      calorieAdjustment: calorieAdj,
-      proteinHits,
-      proteinHitRate: thisWeekCheckIns.length > 0 ? proteinHits / thisWeekCheckIns.length : 0,
-      avgSleep: avgSleep.toFixed(1),
-    };
-    
-    // Update user calories if adjustment needed
-    const newUserData = calorieAdj.adjustment !== 0
-      ? { ...state.userData, calories: calorieAdj.newCalories }
-      : state.userData;
-    
-    return {
-      weeklyReviews: [...state.weeklyReviews, review],
-      lastReviewDate: now.toISOString(),
-      userData: newUserData,
-    };
-  }),
-  
-  // ==================== SMART SUGGESTIONS ====================
-  getNextWorkoutType: () => {
-    const state = get();
-    const history = state.workoutHistory;
-    
-    if (history.length === 0) return 'Push';
-    
-    const last = history[history.length - 1];
-    const rotation = ['Push', 'Pull', 'Legs'];
-    const currentIndex = rotation.indexOf(last.type);
-    
-    if (currentIndex === -1) return 'Push';
-    return rotation[(currentIndex + 1) % rotation.length];
   },
   
-  getWorkoutInsight: (type) => {
+  // ============================================
+  // PROGRESSION & HISTORY
+  // ============================================
+  
+  getLastSession: (exerciseId) => {
     const state = get();
-    const now = new Date();
     const history = state.workoutHistory;
     
-    // Find last workout of this type
-    const lastOfType = history.filter((w) => w.type === type).pop();
+    if (!history || history.length === 0) return null;
     
-    if (!lastOfType) {
-      return { message: `Your first ${type} session. Let's crush it!`, type: 'info' };
+    // Find the most recent workout with this exercise
+    for (let i = history.length - 1; i >= 0; i--) {
+      const workout = history[i];
+      if (!workout.sets) continue;
+      
+      const exerciseSets = workout.sets.filter(
+        (s) => s.exerciseId === exerciseId || s.exercise === exerciseId
+      );
+      
+      if (exerciseSets.length > 0) {
+        const weights = exerciseSets.map((s) => safeParseFloat(s.weight));
+        const reps = exerciseSets.map((s) => safeParseInt(s.reps));
+        
+        return {
+          date: workout.date,
+          sets: exerciseSets,
+          maxWeight: Math.max(...weights),
+          commonWeight: weights.sort((a, b) => 
+            weights.filter(w => w === a).length - weights.filter(w => w === b).length
+          ).pop(), // Most frequent weight
+          avgReps: Math.round(reps.reduce((a, b) => a + b, 0) / reps.length),
+        };
+      }
     }
     
-    const daysSince = Math.floor(
-      (now - new Date(lastOfType.date)) / (1000 * 60 * 60 * 24)
-    );
-    
-    if (daysSince <= 2) {
-      return { 
-        message: `Last ${type} was ${daysSince} days ago. Good frequency!`, 
-        type: 'success' 
-      };
-    }
-    
-    if (daysSince >= 5) {
-      return { 
-        message: `Last ${type} was ${daysSince} days ago. You're well rested!`, 
-        type: 'info' 
-      };
-    }
-    
-    return { message: `Ready for ${type}!`, type: 'info' };
+    return null;
   },
   
   getProgressiveSuggestions: (exerciseId) => {
     const state = get();
-    const lastWorkout = state.workoutHistory
-      .filter((w) => w.sets.some((s) => s.exerciseId === exerciseId))
-      .pop();
+    const history = state.workoutHistory;
     
-    if (!lastWorkout) return null;
-    return calcProgressiveSuggestion(lastWorkout, exerciseId);
-  },
-  
-  getLastSession: (exerciseId) => {
-    const state = get();
-    // Find the most recent workout containing this exercise
-    const lastWorkout = state.workoutHistory
-      .filter((w) => w.sets.some((s) => s.exerciseId === exerciseId))
-      .pop();
+    if (!history || history.length === 0) return null;
     
-    if (!lastWorkout) return null;
-    
-    // Get all sets for this exercise in that workout
-    const exerciseSets = lastWorkout.sets.filter((s) => s.exerciseId === exerciseId);
-    if (exerciseSets.length === 0) return null;
-    
-    // Return summary of last session
-    return {
-      date: lastWorkout.date,
-      sets: exerciseSets,
-      // Get most common weight (mode)
-      commonWeight: exerciseSets
-        .map((s) => parseFloat(s.weight))
-        .sort((a, b) => 
-          exerciseSets.filter((s) => parseFloat(s.weight) === b).length -
-          exerciseSets.filter((s) => parseFloat(s.weight) === a).length
-        )[0],
-      // Get most common reps
-      commonReps: exerciseSets
-        .map((s) => parseInt(s.reps))
-        .sort((a, b) => 
-          exerciseSets.filter((s) => parseInt(s.reps) === b).length -
-          exerciseSets.filter((s) => parseInt(s.reps) === a).length
-        )[0],
-    };
-  },
-  
-  // ==================== PERSISTENCE ====================
-  saveData: async () => {
-    try {
-      const state = get();
-      const dataToSave = {
-        userData: state.userData,
-        isOnboarded: state.isOnboarded,
-        workoutHistory: state.workoutHistory,
-        weightHistory: state.weightHistory,
-        dailyCheckIns: state.dailyCheckIns,
-        prs: state.prs,
-        draftWorkout: state.draftWorkout,
-        weeklyReviews: state.weeklyReviews,
-        lastReviewDate: state.lastReviewDate,
-      };
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-    } catch (error) {
-      console.error('Save failed:', error);
-    }
-  },
-  
-  loadData: async () => {
-    try {
-      const data = await AsyncStorage.getItem(STORAGE_KEY);
-      if (data) {
-        const parsed = JSON.parse(data);
-        set({
-          userData: parsed.userData || get().userData,
-          isOnboarded: parsed.isOnboarded || false,
-          workoutHistory: parsed.workoutHistory || [],
-          weightHistory: parsed.weightHistory || [],
-          dailyCheckIns: parsed.dailyCheckIns || [],
-          prs: parsed.prs || {},
-          draftWorkout: parsed.draftWorkout || null,
-          weeklyReviews: parsed.weeklyReviews || [],
-          lastReviewDate: parsed.lastReviewDate || null,
-        });
+    // Find most recent workout with this exercise
+    for (let i = history.length - 1; i >= 0; i--) {
+      const workout = history[i];
+      if (!workout.sets) continue;
+      
+      const hasExercise = workout.sets.some(
+        (s) => s.exerciseId === exerciseId || s.exercise === exerciseId
+      );
+      
+      if (hasExercise) {
+        return calcProgressiveSuggestion(workout, exerciseId);
       }
+    }
+    
+    return null;
+  },
+  
+  // ============================================
+  // WORKOUT ROTATION
+  // ============================================
+  
+  getNextWorkoutType: () => {
+    const state = get();
+    const history = state.workoutHistory;
+    
+    if (!history || history.length === 0) return 'Push';
+    
+    // Get last non-Custom workout
+    const lastWorkout = [...history]
+      .reverse()
+      .find((w) => w.type && w.type !== 'Custom' && w.type !== 'Cardio');
+    
+    if (!lastWorkout) return 'Push';
+    
+    const rotation = ['Push', 'Pull', 'Legs'];
+    const lastIndex = rotation.indexOf(lastWorkout.type);
+    
+    if (lastIndex === -1) return 'Push';
+    
+    return rotation[(lastIndex + 1) % rotation.length];
+  },
+  
+  // ============================================
+  // RESET (for testing/debugging)
+  // ============================================
+  
+  resetAllData: async () => {
+    try {
+      await AsyncStorage.removeItem(STORAGE_KEY);
+      set({ ...defaultState });
     } catch (error) {
-      console.error('Load failed:', error);
+      console.error('Failed to reset data:', error);
     }
   },
 }));
 
-// Auto-save on state changes
-useStore.subscribe((state) => {
-  state.saveData();
-});
+// REMOVED: Auto-save subscription that caused race conditions
+// Instead, we call debouncedSave explicitly when state changes
+
+export default useStore;
